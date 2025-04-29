@@ -20,7 +20,7 @@ export const Problem = () => {
           className="max-w-4xl mx-auto text-center"
         >
           <h2 className="mb-8 text-4xl font-bold text-gray-900">
-            Search has changed. SEO hasn't.
+            Search has changed. SEO hasn&apos;t.
           </h2>
           
           <div className="grid grid-cols-1 gap-8 mt-12 md:grid-cols-3">

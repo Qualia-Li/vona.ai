@@ -22,7 +22,7 @@ export const CTA = () => {
       toast.success("Thanks for your interest! We'll be in touch soon.");
       setEmail('');
       setUseCase('');
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
