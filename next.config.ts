@@ -22,6 +22,15 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  async rewrites() {
+    return [
+      {
+        source: "/((?!_next).*)",
+        destination: "https://enception-ai.webflow.io/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
