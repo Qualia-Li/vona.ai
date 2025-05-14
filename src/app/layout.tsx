@@ -1,26 +1,32 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "sonner";
+import { MainNav } from "@/components/layout/main-nav";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Enception.ai - Get Discovered in AI Search Engines",
-  description: "We help brands appear in AI-generated answers like Google AI Overview, ChatGPT, and Perplexity — using long-tail video content and multi-channel SEO.",
-  keywords: ["AI SEO", "AI Search", "Content Optimization", "ChatGPT SEO", "Google AI", "Video SEO"],
+  title: "Enception - AI-Powered SEO Platform",
+  description: "Optimize your website's visibility with AI-powered SEO tools",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en">
       <body className={inter.className}>
-        <Toaster position="top-center" />
-        {children}
+        <div className="border-b">
+          <div className="flex h-16 items-center px-4">
+            <div className="mr-8 flex">
+              <h1 className="text-xl font-bold">Enception</h1>
+            </div>
+            <MainNav />
+          </div>
+        </div>
+        <main className="container mx-auto py-6">{children}</main>
       </body>
     </html>
   );
