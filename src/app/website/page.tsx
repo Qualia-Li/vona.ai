@@ -7,17 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { analyzeWebsite } from "@/lib/api/website";
-import { useAnalysisStore } from "@/lib/store/analysis";
-import type { WebsiteStore } from "@/lib/store/analysis";
-import { Website } from "@/types";
+import { useWebsiteStore } from "@/lib/store/websiteStore";
+import type { WebsiteStore } from "@/lib/store/websiteStore";
 
 export default function WebsiteInputPage() {
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const setResults = useAnalysisStore(
-    (state: WebsiteStore) => state.setResults
-  );
+  const setResults = useWebsiteStore((state: WebsiteStore) => state.setResults);
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();

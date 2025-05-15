@@ -9,7 +9,7 @@ export interface WebsiteStore {
   clearResults: () => void;
 }
 
-export const useAnalysisStore = create<WebsiteStore>()(
+export const useWebsiteStore = create<WebsiteStore>()(
   persist(
     (set) => ({
       results: null,
