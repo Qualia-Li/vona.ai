@@ -13,12 +13,15 @@ import {
 } from "../ui/tooltip";
 import { getFaviconUrl } from "@/lib/utils";
 import { Favicon } from "../common/Favicon";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface ReferenceListProps {
   references: Reference[];
 }
 
 export default function ReferenceList({ references }: ReferenceListProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const DEFAULT_DISPLAY_COUNT = 10;
 
   const getDifficultyColor = (difficulty: string) => {
     switch(difficulty.toLowerCase()) {
@@ -29,10 +32,14 @@ export default function ReferenceList({ references }: ReferenceListProps) {
     }
   };
 
+  const displayedReferences = isExpanded 
+    ? references 
+    : references.slice(0, DEFAULT_DISPLAY_COUNT);
+
   return (
     <div className="space-y-4">
-      <Card className="bg-[#202124] p-4 space-y-4">
-        {references.map((reference, index) => (
+      <Card className="bg-[#202124] p-4 space-y-4 gap-0">
+        {displayedReferences.map((reference, index) => (
           <a
             key={index}
             href={reference.link}
@@ -79,6 +86,23 @@ export default function ReferenceList({ references }: ReferenceListProps) {
           </a>
         ))}
 
+        {references.length > DEFAULT_DISPLAY_COUNT && (
+          <Button
+            variant="ghost"
+            className="w-full text-gray-400 hover:text-white hover:bg-white/5"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? (
+              <div className="flex items-center gap-2">
+                Show Less <ChevronUp className="h-4 w-4" />
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                Show More ({references.length - DEFAULT_DISPLAY_COUNT} more) <ChevronDown className="h-4 w-4" />
+              </div>
+            )}
+          </Button>
+        )}
       </Card>
     </div>
   );
