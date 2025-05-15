@@ -1,10 +1,12 @@
 'use client'
 
+import { ArrowUpDown, LayoutGrid, Table as TableIcon } from "lucide-react";
+import { useState } from "react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useKeywordsStore } from "@/lib/store/keywordsStore";
 import {
   Table,
   TableBody,
@@ -13,9 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
-import { ArrowUpDown, LayoutGrid, Table as TableIcon } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
+import { useKeywordsStore } from "@/lib/store/keywordsStore";
 
 type SortField = 'volume' | 'aiOverviewLikelihood' | 'optimizationDifficulty' | 'purchaseIntent'
 type SortOrder = 'asc' | 'desc'

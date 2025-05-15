@@ -1,19 +1,24 @@
 "use client";
 
-import { Reference } from "@/types/aiOverview";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+
+import { getFaviconUrl } from "@/lib/utils";
+import { Reference } from "@/types/aiOverview";
+
+import { Favicon } from "../common/Favicon";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { getFaviconUrl } from "@/lib/utils";
-import { Favicon } from "../common/Favicon";
-import { ChevronDown, ChevronUp } from "lucide-react";
+
+
+
 
 interface ReferenceListProps {
   references: Reference[];

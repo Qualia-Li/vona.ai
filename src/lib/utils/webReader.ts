@@ -1,6 +1,3 @@
-import { Readability } from '@mozilla/readability';
-import { JSDOM } from 'jsdom';
-
 export interface ParsedWebPage {
   title: string;
   content: string;

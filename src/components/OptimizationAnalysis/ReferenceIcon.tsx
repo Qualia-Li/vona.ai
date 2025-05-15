@@ -2,6 +2,7 @@
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Difficulty, Reference } from "@/types/aiOverview"
+
 import { Favicon } from "../common/Favicon"
 interface ReferenceIconProps {
   reference: Reference

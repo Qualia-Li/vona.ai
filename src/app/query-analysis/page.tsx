@@ -1,20 +1,17 @@
 'use client'
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AIOverview from "@/components/AIOverview/AIOverviewCard";
-import { useAIOverview } from "@/lib/store/useAIOverview";
 import { useEffect, useState } from "react";
+
+import AIOverview from "@/components/AIOverview/AIOverviewCard";
 import AIOverviewCard from "@/components/AIOverview/AIOverviewCard";
-import OptimizationAnalysis from "@/components/OptimizationAnalysis/OptimizationAnalysis";
-import { useKeywordsStore } from "@/lib/store/keywordsStore";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import FAQ from "@/components/FAQ/FAQ";
-import { fetchAIOverview } from "@/lib/api/aiOverview";
 import CompetitorAnalysis from "@/components/CompetitorAnalysis/CompetitorAnalysis";
+import FAQ from "@/components/FAQ/FAQ";
+import OptimizationAnalysis from "@/components/OptimizationAnalysis/OptimizationAnalysis";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -22,6 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useKeywordsStore } from "@/lib/store/keywordsStore";
+import { useAIOverview } from "@/lib/store/useAIOverview";
+
+
+import { fetchAIOverview } from "@/lib/api/aiOverview";
 
 export default function QueryAnalysisPage() {
   const { aiOverviewData, setAiOverviewData } = useAIOverview();

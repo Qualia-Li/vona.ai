@@ -1,5 +1,6 @@
-import Image from 'next/image';
 import { Globe2 } from 'lucide-react';
+import Image from 'next/image';
+
 import { getFaviconUrl } from '@/lib/utils';
 
 interface FaviconProps {

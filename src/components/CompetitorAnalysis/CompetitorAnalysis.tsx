@@ -1,11 +1,13 @@
 'use client'
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import Image from "next/image"
-import { Reference } from "@/types/aiOverview"
-import { getFaviconUrl } from "@/lib/utils"
 import { useState, useEffect } from "react"
+
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { getFaviconUrl } from "@/lib/utils"
 import { parseWebPage } from "@/lib/utils/webReader"
+import { Reference } from "@/types/aiOverview"
+
 import { Favicon } from "../common/Favicon"
 
 interface CompetitorAnalysisProps {

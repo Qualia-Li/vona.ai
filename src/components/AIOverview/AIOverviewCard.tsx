@@ -1,9 +1,13 @@
+import { ChevronRight, Link as LinkIcon, MoreVertical, PlayCircle } from "lucide-react";
+import Image from "next/image";
+
+import ReferenceList from "@/components/AIOverview/ReferenceList";
 import { Card } from "@/components/ui/card";
 import { AIOverview, AIOverview as AIOverviewType } from "@/types/aiOverview";
-import { ChevronRight, Link as LinkIcon, MoreVertical, PlayCircle } from "lucide-react";
+
 import { Button } from "../ui/button";
-import ReferenceList from "@/components/AIOverview/ReferenceList";
-import Image from "next/image";
+
+
 
 interface AIOverviewProps {
   data?: AIOverview | null;

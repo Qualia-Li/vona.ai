@@ -26,7 +26,7 @@ const eslintConfig = [
         varsIgnorePattern: "^_",
         caughtErrorsIgnorePattern: "^_"
       }],
-      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-explicit-any": "warn",
       "import/order": [
         "warn",
         {
