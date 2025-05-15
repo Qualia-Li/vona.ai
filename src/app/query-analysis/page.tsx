@@ -1,10 +1,47 @@
+'use client'
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AIOverview from "@/components/AIOverview/AIOverview";
+import AIOverview from "@/components/AIOverview/AIOverviewCard";
+import { useAIOverview } from "@/lib/store/useAIOverview";
+import { useEffect } from "react";
+import AIOverviewCard from "@/components/AIOverview/AIOverviewCard";
+import OptimizationAnalysis from "@/components/OptimizationAnalysis/OptimizationAnalysis";
 
 export default function QueryAnalysisPage() {
+  const { data, setData } = useAIOverview();
+
+  useEffect(() => {
+    // Simulating data fetch - replace with actual API call
+    setData([
+      {
+        type: "paragraph",
+        snippet: "Android Runtime (ART) is the virtual machine that runs apps and some system services on Android devices. ART works by:",
+        reference_indexes: [0, 2, 3],
+      },
+      {
+        type: "list",
+        list: [
+          {
+            title: "Compiling code ahead of time",
+            snippet: "ART uses Ahead of Time (AOT) compilation to compile code before the app is executed...",
+            reference_indexes: [3, 4],
+          },
+        ],
+      },
+    ], 
+    [{
+      title: "Android runtime and Dalvik | Android Open Source Project",
+      link: "https://source.android.com/docs/core/runtime",
+      snippet: "Aug 26, 2024 — Android runtime (ART) is the managed runtime used by apps...",
+      source: "Android Open Source Project",
+      index: 0,
+      difficulty: "easy",
+    }]);
+  }, [setData]);
+
   return (
     <div>
       <div className="mb-8">
@@ -25,41 +62,7 @@ export default function QueryAnalysisPage() {
           </TabsTrigger>
         </TabsList>
 
-        <AIOverview
-          data={{
-            text_blocks: [
-              {
-                type: "paragraph",
-                snippet:
-                  "Android Runtime (ART) is the virtual machine that runs apps and some system services on Android devices. ART works by:",
-                reference_indexes: [0, 2, 3],
-              },
-              {
-                type: "list",
-                list: [
-                  {
-                    title: "Compiling code ahead of time",
-                    snippet:
-                      "ART uses Ahead of Time (AOT) compilation to compile code before the app is executed...",
-                    reference_indexes: [3, 4],
-                  },
-                ],
-              },
-            ],
-            references: [
-              {
-                title:
-                  "Android runtime and Dalvik | Android Open Source Project",
-                link: "https://source.android.com/docs/core/runtime",
-                snippet:
-                  "Aug 26, 2024 — Android runtime (ART) is the managed runtime used by apps...",
-                source: "Android Open Source Project",
-                index: 0,
-                difficulty: "easy",
-              },
-            ],
-          }}
-        />
+        <AIOverviewCard data={data} />
 
         <TabsContent value="best-online-shopping" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -101,33 +104,7 @@ export default function QueryAnalysisPage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Optimization Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-sm font-medium mb-2">
-                      Optimization Difficulty
-                    </div>
-                    <Progress value={65} className="h-2" />
-                    <div className="text-sm text-muted-foreground mt-1">
-                      65% - Moderate
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium mb-2">
-                      Conversion Difficulty
-                    </div>
-                    <Progress value={45} className="h-2" />
-                    <div className="text-sm text-muted-foreground mt-1">
-                      45% - Low
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <OptimizationAnalysis referenceList={data?.references || []} />
           </div>
 
           <Card>
