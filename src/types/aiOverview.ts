@@ -6,6 +6,7 @@ export interface Reference {
   snippet: string;
   source: string;
   index: number;
+  difficulty: 'easy' | 'medium' | 'hard';
 }
 
 export interface ListItem {

@@ -55,6 +55,7 @@ export default function QueryAnalysisPage() {
                   "Aug 26, 2024 — Android runtime (ART) is the managed runtime used by apps...",
                 source: "Android Open Source Project",
                 index: 0,
+                difficulty: "easy",
               },
             ],
           }}
