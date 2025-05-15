@@ -1,12 +1,14 @@
 export type TextBlockType = 'paragraph' | 'list';
 
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
 export interface Reference {
   title: string;
   link: string;
   snippet: string;
   source: string;
   index: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: Difficulty;
 }
 
 export interface ListItem {

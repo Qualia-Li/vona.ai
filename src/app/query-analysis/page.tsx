@@ -13,6 +13,7 @@ import { useKeywordsStore } from "@/lib/store/keywordsStore";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import FAQ from "@/components/FAQ/FAQ";
+import { fetchAIOverview } from "@/lib/api/aiOverview";
 
 export default function QueryAnalysisPage() {
   const { aiOverviewData, setAiOverviewData } = useAIOverview();
@@ -129,15 +130,19 @@ export default function QueryAnalysisPage() {
       <div className="space-y-6">
         {/* Search Input Section */}
         <div className="flex gap-2">
-          <Input 
-            placeholder="Enter keyword to analyze..." 
+          <Input
+            placeholder="Enter keyword to analyze..."
             className="max-w-xl"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <Button>
-            Analyze
-          </Button>
+          <Button onClick={() => {
+            setAiOverviewData([], []);
+            console.log("Fetching AI Overview for query:", query);
+            fetchAIOverview(query).then((data) => {
+              setAiOverviewData(data.text_blocks, data.references);
+            });
+          }}>Analyze</Button>
         </div>
 
         {/* Suggested Keywords */}
@@ -147,9 +152,9 @@ export default function QueryAnalysisPage() {
           </p>
           <div className="flex flex-wrap gap-2">
             {keywords?.map((keyword, index) => (
-              <Badge 
-                key={index} 
-                variant="secondary" 
+              <Badge
+                key={index}
+                variant="secondary"
                 className="cursor-pointer hover:bg-secondary/80"
                 onClick={() => handleKeywordClick(keyword.term)}
               >
@@ -180,7 +185,9 @@ export default function QueryAnalysisPage() {
                       </div>
                     </div>
                     <div>
-                      <div className="text-sm font-medium mb-2">Content Gaps</div>
+                      <div className="text-sm font-medium mb-2">
+                        Content Gaps
+                      </div>
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <Badge variant="outline">Pricing comparison</Badge>
