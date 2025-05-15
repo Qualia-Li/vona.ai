@@ -1,6 +1,6 @@
 This is a NextJS project for Enception.AI, the AI influence engine. 
 
-When generating frontend, make sure you do it to maximize the SEO, use server side rendering when possible. 
+When generating frontend, make sure you do it to maximize the SEO, use server side rendering when possible. When adding a page, remember to add it also to sitemap.xml.
 
 Do not add too much comments (only to instruct, don't explain too much).
 
