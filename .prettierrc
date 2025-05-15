@@ -9,6 +9,6 @@
   "endOfLine": "lf",
   "jsxSingleQuote": true,
   "proseWrap": "preserve",
-  "useTabs": true,
+  "useTabs": false,
   "bracketSpacing": true
 }
