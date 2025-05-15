@@ -2,22 +2,10 @@
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Difficulty, Reference } from "@/types/aiOverview"
-import { getFaviconUrl } from "@/lib/utils"
 import { Favicon } from "../common/Favicon"
 interface ReferenceIconProps {
   reference: Reference
   difficulty: Difficulty
-}
-
-const getDifficultyBadgeVariant = (difficulty: Difficulty) => {
-  switch (difficulty) {
-    case "easy":
-      return "secondary";
-    case "medium":
-      return "outline";
-    case "hard":
-      return "destructive";
-  }
 }
 
 export default function ReferenceIcon({ reference, difficulty }: ReferenceIconProps) {
@@ -37,15 +25,6 @@ export default function ReferenceIcon({ reference, difficulty }: ReferenceIconPr
       <Tooltip>
         <TooltipTrigger>
           <div className={`relative h-8 w-8 rounded-full overflow-hidden border-2 ${getDifficultyColor(difficulty)} transition-all cursor-pointer`} onClick={() => window.open(reference.link, '_blank')}>
-            {/* <img
-              src={getFaviconUrl(reference.link)}
-              alt={`${reference.title} favicon`}
-              className="h-full w-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.classList.remove('hidden');
-              }}
-            /> */}
             <Favicon url={reference.link} source={reference.title} size={28}/>
             <div className="hidden absolute inset-0 bg-secondary flex items-center justify-center text-xs font-medium">
               {reference.title.substring(0, 2).toUpperCase()}
