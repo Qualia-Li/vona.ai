@@ -106,8 +106,7 @@ export default function QueryAnalysisPage() {
 
         <Tabs defaultValue="best-online-shopping" className="space-y-4">
           <TabsContent value="best-online-shopping" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card>
+              {/* <Card>
                 <CardHeader>
                   <CardTitle>AI Overview Analysis</CardTitle>
                 </CardHeader>
@@ -145,12 +144,11 @@ export default function QueryAnalysisPage() {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+              </Card> */}
 
               <OptimizationAnalysis
                 referenceList={aiOverviewData?.references || []}
               />
-            </div>
 
             <Card>
               <CardHeader>
