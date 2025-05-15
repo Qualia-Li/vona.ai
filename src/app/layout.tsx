@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Image from "next/image";
 
 import "./globals.css";
 import { MainNav } from "@/components/layout/main-nav";
@@ -21,8 +22,16 @@ export default function RootLayout({
       <body className={inter.className}>
         <div className="border-b">
           <div className="flex h-16 items-center px-4">
-            <div className="mr-8 flex">
-              <h1 className="text-xl font-bold">Enception</h1>
+            <div className="mr-8 flex items-center">
+              <Image
+                src="/images/enception_logo.png"
+                alt="Enception Logo"
+                width={140}
+                height={32}
+                priority
+                className="h-8 w-auto"
+              />
+              <h1 className="text-lg font-bold">Enception</h1>
             </div>
             <MainNav />
           </div>
