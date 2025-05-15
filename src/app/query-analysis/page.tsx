@@ -12,6 +12,7 @@ import OptimizationAnalysis from "@/components/OptimizationAnalysis/Optimization
 import { useKeywordsStore } from "@/lib/store/keywordsStore";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import FAQ from "@/components/FAQ/FAQ";
 
 export default function QueryAnalysisPage() {
   const { aiOverviewData, setAiOverviewData } = useAIOverview();
@@ -83,6 +84,37 @@ export default function QueryAnalysisPage() {
   const handleKeywordClick = (term: string) => {
     setQuery(term);
   };
+
+  const faqItems = [
+    {
+      question: "How does the keyword analysis work?",
+      answer: "Our system analyzes your keywords against AI search patterns, content gaps, and competitor data to provide actionable insights for optimization."
+    },
+    {
+      question: "What do the suggested keywords mean?",
+      answer: "These are trending or relevant keywords in your niche that have shown potential for AI visibility. Click any keyword to analyze it instantly."
+    },
+    {
+      question: "How often is the analysis updated?",
+      answer: "The analysis is updated in real-time when you click 'Analyze', incorporating the latest AI search patterns and competitor data."
+    },
+    {
+      question: "How do keyword types affect AI Overview visibility?",
+      answer: "Informational queries typically have a higher chance of triggering AI Overviews compared to commercial or transactional keywords. Focus on educational and explanatory content for better visibility."
+    },
+    {
+      question: "What role does content quality play in AI Overviews?",
+      answer: "High-quality, comprehensive content that thoroughly addresses user intent is more likely to be featured in AI Overviews. Ensure your content covers the topic in-depth and provides clear value."
+    },
+    {
+      question: "How can structured data improve AI Overview chances?",
+      answer: "Implementing proper schema markup helps AI systems better understand your content context and structure, potentially increasing your chances of appearing in AI Overviews."
+    },
+    {
+      question: "Why does my URL placement in AI Overviews change?",
+      answer: "URL placement in AI Overviews can fluctuate as Google's algorithms evolve. Regular monitoring helps understand these patterns and adapt your content strategy accordingly."
+    }
+  ];
 
   return (
     <div>
@@ -202,6 +234,15 @@ export default function QueryAnalysisPage() {
             {/* Similar structure as above, with different values */}
           </TabsContent>
         </Tabs>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Frequently Asked Questions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FAQ items={faqItems} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
