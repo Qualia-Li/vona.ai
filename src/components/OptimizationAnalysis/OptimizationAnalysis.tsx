@@ -40,13 +40,13 @@ export default function OptimizationAnalysis({ referenceList }: OptimizationAnal
       <CardContent>
         <div className="space-y-6">
           <div>
-            <div className="text-sm font-medium mb-2">Reference Difficulty</div>
+            <div className="text-sm font-medium mb-2">Reference List</div>
             <div className="flex gap-2 mb-4">
               {referenceList
                 .sort(
                   (a, b) =>
-                    easinessScores[a.difficulty] -
-                    easinessScores[b.difficulty]
+                    easinessScores[b.difficulty] -  // easy to hard
+                    easinessScores[a.difficulty]
                 )
                 .map((ref) => (
                   <div
