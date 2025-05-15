@@ -6,14 +6,14 @@ import { Problem } from '@/components/sections/Problem';
 import { Solution } from '@/components/sections/Solution';
 
 export default function Home() {
-	return (
-		<main>
-			<Hero />
-			<Problem />
-			<Solution />
-			<Features />
-			<CTA />
-			<Footer />
-		</main>
-	);
+  return (
+    <main>
+      <Hero />
+      <Problem />
+      <Solution />
+      <Features />
+      <CTA />
+      <Footer />
+    </main>
+  );
 }
