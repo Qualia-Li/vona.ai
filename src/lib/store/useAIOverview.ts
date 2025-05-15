@@ -2,16 +2,16 @@ import { create } from 'zustand'
 import { AIOverview } from '@/types/aiOverview'
 
 interface AIOverviewState {
-  data: AIOverview | null;
+  aiOverviewData: AIOverview | null;
   isLoading: boolean;
-  setData: (
+  setAiOverviewData: (
     textBlocks: AIOverview["text_blocks"],
     references: AIOverview["references"]
   ) => void;
 }
 
 export const useAIOverview = create<AIOverviewState>((set) => ({
-  data: null,
+  aiOverviewData: null,
   isLoading: false,
-  setData: (text_blocks, references) => set({ data: { text_blocks, references } }),
+  setAiOverviewData: (text_blocks, references) => set({ aiOverviewData: { text_blocks, references } }),
 })) 

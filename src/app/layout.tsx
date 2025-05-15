@@ -31,7 +31,7 @@ export default function RootLayout({
                 priority
                 className="h-8 w-auto"
               />
-              <h1 className="text-lg font-bold">Enception</h1>
+              <span className="text-lg font-bold">Enception</span>
             </div>
             <MainNav />
           </div>

@@ -6,16 +6,21 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AIOverview from "@/components/AIOverview/AIOverviewCard";
 import { useAIOverview } from "@/lib/store/useAIOverview";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AIOverviewCard from "@/components/AIOverview/AIOverviewCard";
 import OptimizationAnalysis from "@/components/OptimizationAnalysis/OptimizationAnalysis";
+import { useKeywordsStore } from "@/lib/store/keywordsStore";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function QueryAnalysisPage() {
-  const { data, setData } = useAIOverview();
+  const { aiOverviewData, setAiOverviewData } = useAIOverview();
+  const { keywords } = useKeywordsStore();
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     // Simulating data fetch - replace with actual API call
-    setData([
+    setAiOverviewData([
       {
         type: "paragraph",
         snippet: "Android Runtime (ART) is the virtual machine that runs apps and some system services on Android devices. ART works by:",
@@ -73,7 +78,11 @@ export default function QueryAnalysisPage() {
         difficulty: "medium"
       }
     ]);
-  }, [setData]);
+  }, [setAiOverviewData]);
+
+  const handleKeywordClick = (term: string) => {
+    setQuery(term);
+  };
 
   return (
     <div>
@@ -85,88 +94,115 @@ export default function QueryAnalysisPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="best-online-shopping" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="best-online-shopping">
-            best online shopping
-          </TabsTrigger>
-          <TabsTrigger value="discount-electronics">
-            discount electronics
-          </TabsTrigger>
-        </TabsList>
+      <div className="space-y-6">
+        {/* Search Input Section */}
+        <div className="flex gap-2">
+          <Input 
+            placeholder="Enter keyword to analyze..." 
+            className="max-w-xl"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <Button>
+            Analyze
+          </Button>
+        </div>
 
-        <AIOverviewCard data={data} />
+        {/* Suggested Keywords */}
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Suggested keywords for you:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {keywords?.map((keyword, index) => (
+              <Badge 
+                key={index} 
+                variant="secondary" 
+                className="cursor-pointer hover:bg-secondary/80"
+                onClick={() => handleKeywordClick(keyword.term)}
+              >
+                {keyword.term}
+              </Badge>
+            ))}
+          </div>
+        </div>
 
-        <TabsContent value="best-online-shopping" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+        <AIOverviewCard data={aiOverviewData} />
+
+        <Tabs defaultValue="best-online-shopping" className="space-y-4">
+          <TabsContent value="best-online-shopping" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>AI Overview Analysis</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="text-sm font-medium mb-2">
+                        AI Trigger Potential
+                      </div>
+                      <Progress value={78} className="h-2" />
+                      <div className="text-sm text-muted-foreground mt-1">
+                        78%
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium mb-2">Content Gaps</div>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">Pricing comparison</Badge>
+                          <span className="text-sm text-muted-foreground">
+                            High priority
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">
+                            Technical specifications
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">
+                            Medium priority
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <OptimizationAnalysis
+                referenceList={aiOverviewData?.references || []}
+              />
+            </div>
+
             <Card>
               <CardHeader>
-                <CardTitle>AI Overview Analysis</CardTitle>
+                <CardTitle>Competitor Analysis</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div>
-                    <div className="text-sm font-medium mb-2">
-                      AI Trigger Potential
-                    </div>
-                    <Progress value={78} className="h-2" />
-                    <div className="text-sm text-muted-foreground mt-1">
-                      78%
-                    </div>
+                  <div className="flex items-center gap-4">
+                    <Badge>Strong presence on Reddit</Badge>
+                    <span className="text-sm text-muted-foreground">
+                      Multiple active discussions and product recommendations
+                    </span>
                   </div>
-                  <div>
-                    <div className="text-sm font-medium mb-2">Content Gaps</div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">Pricing comparison</Badge>
-                        <span className="text-sm text-muted-foreground">
-                          High priority
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">
-                          Technical specifications
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          Medium priority
-                        </span>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-4">
+                    <Badge>Limited Quora coverage</Badge>
+                    <span className="text-sm text-muted-foreground">
+                      Opportunity for detailed answers and expert insights
+                    </span>
                   </div>
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
-            <OptimizationAnalysis referenceList={data?.references || []} />
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Competitor Analysis</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <Badge>Strong presence on Reddit</Badge>
-                  <span className="text-sm text-muted-foreground">
-                    Multiple active discussions and product recommendations
-                  </span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Badge>Limited Quora coverage</Badge>
-                  <span className="text-sm text-muted-foreground">
-                    Opportunity for detailed answers and expert insights
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="discount-electronics" className="space-y-4">
-          {/* Similar structure as above, with different values */}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="discount-electronics" className="space-y-4">
+            {/* Similar structure as above, with different values */}
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 } 
