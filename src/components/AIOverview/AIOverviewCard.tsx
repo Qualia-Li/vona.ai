@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { AIOverview, AIOverview as AIOverviewType } from "@/types/aiOverview";
-import { ChevronRight, Link as LinkIcon, MoreVertical } from "lucide-react";
+import { ChevronRight, Link as LinkIcon, MoreVertical, PlayCircle } from "lucide-react";
 import { Button } from "../ui/button";
 import ReferenceList from "@/components/AIOverview/ReferenceList";
+import Image from "next/image";
 
 interface AIOverviewProps {
   data?: AIOverview | null;
@@ -68,6 +69,37 @@ export default function AIOverviewCard({data}: AIOverviewProps) {
                       </button>
                     )}
                   </p>
+
+                  { block.video && <div key={index} className="relative group">
+                    <a
+                      href={block.video.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block relative rounded-lg overflow-hidden hover:opacity-90 transition-opacity"
+                    >
+                      <div className="relative aspect-video">
+                        <Image
+                          src={block.video.thumbnail}
+                          alt="Video thumbnail"
+                          fill
+                          className="object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                          <PlayCircle className="w-16 h-16 text-white" />
+                        </div>
+                      </div>
+                      <div className="mt-2 space-y-1">
+                        <p className="text-[15px] leading-relaxed">
+                          {block.snippet}
+                        </p>
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <span>{block.video.source}</span>
+                          <span>•</span>
+                          <span>{block.video.date}</span>
+                        </div>
+                      </div>
+                    </a>
+                  </div>}
                 </div>
               );
             }

@@ -17,11 +17,19 @@ export interface ListItem {
   reference_indexes: number[];
 }
 
+export interface Video {
+  link: string;
+  date: string;
+  source: string;
+  thumbnail: string;
+}
+
 export interface TextBlock {
   type: TextBlockType;
   snippet?: string;
   reference_indexes?: number[];
   list?: ListItem[];
+  video?: Video;
 }
 
 export interface AIOverview {
