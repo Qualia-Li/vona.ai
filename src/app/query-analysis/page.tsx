@@ -15,11 +15,19 @@ import { Button } from "@/components/ui/button";
 import FAQ from "@/components/FAQ/FAQ";
 import { fetchAIOverview } from "@/lib/api/aiOverview";
 import CompetitorAnalysis from "@/components/CompetitorAnalysis/CompetitorAnalysis";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function QueryAnalysisPage() {
   const { aiOverviewData, setAiOverviewData } = useAIOverview();
   const { keywords } = useKeywordsStore();
   const [query, setQuery] = useState("");
+  const [questionWord, setQuestionWord] = useState("what is");
 
   const handleKeywordClick = (term: string) => {
     setQuery(term);
@@ -69,6 +77,15 @@ export default function QueryAnalysisPage() {
       <div className="space-y-6">
         {/* Search Input Section */}
         <div className="flex gap-2">
+          <Select value={questionWord} onValueChange={setQuestionWord}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select prefix" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="what is">What is</SelectItem>
+              <SelectItem value="how to">How to</SelectItem>
+            </SelectContent>
+          </Select>
           <Input
             placeholder="Enter keyword to analyze..."
             className="max-w-xl"
@@ -77,8 +94,9 @@ export default function QueryAnalysisPage() {
           />
           <Button onClick={() => {
             setAiOverviewData([], []);
-            console.log("Fetching AI Overview for query:", query);
-            fetchAIOverview(query).then((data) => {
+            const fullQuery = `${questionWord} ${query}`.trim();
+            console.log("Fetching AI Overview for query:", fullQuery);
+            fetchAIOverview(fullQuery).then((data) => {
               setAiOverviewData(data.text_blocks, data.references);
             });
           }}>Analyze</Button>
