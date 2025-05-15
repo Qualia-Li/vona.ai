@@ -25,6 +25,7 @@ export async function suggestKeywords(website: Website): Promise<Keyword[]> {
     {
       id: '1',
       term: 'best online shopping',
+      volume: 1000,
       aiOverviewLikelihood: 85,
       optimizationDifficulty: 65,
       purchaseIntent: 90,
@@ -32,6 +33,7 @@ export async function suggestKeywords(website: Website): Promise<Keyword[]> {
     {
       id: '2',
       term: 'discount electronics',
+      volume: 1000,
       aiOverviewLikelihood: 75,
       optimizationDifficulty: 45,
       purchaseIntent: 85,

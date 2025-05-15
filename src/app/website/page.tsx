@@ -1,8 +1,39 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { analyzeWebsite } from "@/lib/api/website";
+import { useAnalysisStore } from "@/lib/store/analysis";
+import type { WebsiteStore } from "@/lib/store/analysis";
+import { Website } from "@/types";
 
 export default function WebsiteInputPage() {
+  const [url, setUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const setResults = useAnalysisStore(
+    (state: WebsiteStore) => state.setResults
+  );
+
+  const handleAnalyze = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      const data = await analyzeWebsite(url);
+      setResults(data);
+      router.push(`/keywords?url=${encodeURIComponent(url)}`);
+    } catch (error) {
+      console.error('Error analyzing website:', error);
+      alert('Failed to analyze website. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-4xl font-bold mb-4">Get Started with Enception</h1>
@@ -18,14 +49,19 @@ export default function WebsiteInputPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <form onSubmit={handleAnalyze} className="space-y-4">
             <div className="flex gap-2">
               <Input 
                 type="url" 
                 placeholder="https://your-website.com"
                 className="flex-1"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                required
               />
-              <Button type="submit">Analyze</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Analyzing..." : "Analyze"}
+              </Button>
             </div>
           </form>
         </CardContent>

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const items = [
   {
     title: "Website Input",
-    href: "/",
+    href: "/website",
   },
   {
     title: "Keywords",

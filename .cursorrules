@@ -1,0 +1,33 @@
+This is a NextJS project for Enception.AI, the AI influence engine. 
+
+When generating frontend, make sure you do it to maximize the SEO, use server side rendering when possible. 
+
+Do not add too much comments (only to instruct, don't explain too much).
+
+This is the strucutre of the project:
+
+/public               # Static files (e.g., images, favicon)
+/src
+  /app                # App Router: pages, layouts, server/client components
+    /api              # API routes (e.g., app/api/auth/route.ts)
+    /dashboard        # Example route
+    layout.tsx
+    page.tsx
+  /components         # Reusable UI components
+  /lib                # Shared libraries: utils, db, helpers, etc.
+    /api              # API client wrappers (e.g., axios/fetch utils)
+    /auth             # Auth utilities (e.g., session, middleware)
+    /store            # Zustand bear storage
+    db.ts             # DB connection (e.g., Prisma, MongoDB)
+  /server             # Server-side logic (can include services, queries)
+  /services           # Business logic (e.g., userService.ts)
+  /hooks              # Custom React hooks
+  /types              # TypeScript types and interfaces
+  /styles             # Global styles, Tailwind config, etc.
+  /middleware.ts      # Middleware (auth, redirects)
+  /utils              # General utilities (formatters, validators)
+
+.env.local            # Local environment variables
+next.config.js        # Next.js config
+tsconfig.json         # TypeScript config
+package.json          # Dependencies and scripts
