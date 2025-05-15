@@ -6,6 +6,7 @@ import { Reference } from "@/types/aiOverview"
 import { getFaviconUrl } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { parseWebPage } from "@/lib/utils/webReader"
+import { Favicon } from "../common/Favicon"
 
 interface CompetitorAnalysisProps {
   references: Reference[]
@@ -55,14 +56,15 @@ export default function CompetitorAnalysis({ references }: CompetitorAnalysisPro
             <tbody>
               {references.map((ref, index) => (
                 <tr key={index} className="border-t">
-                  <td className="p-2">
-                    <Image
+                  <td className="p-2 flex flex-row items-center gap-2 cursor-pointer" onClick={() => window.open(ref.link, '_blank')}>
+                    {/* <Image
                       src={getFaviconUrl(ref.link)}
                       alt={`Favicon for ${ref.link}`}
                       width={16}
                       height={16}
                       className="inline-block mr-2"
-                    />
+                    /> */}
+                    <Favicon url={ref.link} source={ref.title} size={16}/>
                     {ref.title}
                   </td>
                   {COMPETITORS.map((competitor) => (
