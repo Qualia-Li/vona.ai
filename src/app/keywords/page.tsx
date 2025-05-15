@@ -72,7 +72,12 @@ export default function KeywordsPage() {
               <LayoutGrid className="h-4 w-4" />
             </Toggle>
           </div>
-          <Button>Add Custom Keyword</Button>
+          <Button className="relative group">
+            Add Custom Keyword
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-secondary-foreground text-secondary px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              Coming soon...
+            </span>
+          </Button>
         </div>
       </div>
 
