@@ -82,14 +82,14 @@ export default function AboutPage() {
               priority
             />
             <h3 className="text-2xl font-bold mb-2">
-              <a href="https://quanlai.li" target="_blank" rel="noopener" className="text-blue-500 hover:text-blue-600">
+              <a href="https://quanlai.li" target="_blank" rel="noopener" className="text-primary hover:text-primary/80">
                 Quanlai Li
               </a>
             </h3>
             <p className="text-gray-600 mb-4">Co-founder & CEO</p>
             <p>
               Quanlai is a technical founder who previously built large-scale machine learning systems at Uber and 
-              Robinhood. He founded and scaled <a href="https://chatslide.ai" target="_blank" rel="noopener" className="text-blue-500 hover:text-blue-600">ChatSlide.ai</a>, 
+              Robinhood. He founded and scaled <a href="https://chatslide.ai" target="_blank" rel="noopener" className="text-primary hover:text-primary/80">ChatSlide.ai</a>, 
               an AI video platform that became profitable and doubled organic traffic after deploying GEO. He writes most 
               of our code and leads product and automation.
             </p>
@@ -105,14 +105,14 @@ export default function AboutPage() {
               priority
             />
             <h3 className="text-2xl font-bold mb-2">
-              <a href="https://www.linkedin.com/in/yitongjiao/" target="_blank" rel="noopener" className="text-blue-500 hover:text-blue-600">
+              <a href="https://www.linkedin.com/in/yitongjiao/" target="_blank" rel="noopener" className="text-primary hover:text-primary/80">
                 Brittany Jiao
               </a>
             </h3>
             <p className="text-gray-600 mb-4">Co-founder & COO</p>
             <p>
               Brittany brings deep experience in growth marketing. At Nexthand Media, she ran performance campaigns for 
-              40+ DTC brands. She's the founder of <a href="https://ohtea.co" target="_blank" rel="noopener" className="text-blue-500 hover:text-blue-600">OhTea.co</a> and has led sales, customer success, and onboarding for Enception—closing 7 clients in 4 
+              40+ DTC brands. She's the founder of <a href="https://ohtea.co" target="_blank" rel="noopener" className="text-primary hover:text-primary/80">OhTea.co</a> and has led sales, customer success, and onboarding for Enception—closing 7 clients in 4 
               weeks and building a waitlist of 20+ brands.
             </p>
           </div>
