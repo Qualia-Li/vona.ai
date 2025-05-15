@@ -47,7 +47,7 @@ export const Problem = () => {
                 <h3 className="text-xl font-semibold mb-4">Old SEO</h3>
                 <div className="space-y-2">
                   {Array(3).fill(0).map((_, i) => (
-                    <div key={i} className="h-4 bg-gray-200 rounded w-full"></div>
+                    <div key={i} className="h-4 bg-gray-200 rounded w-full" />
                   ))}
                 </div>
               </div>

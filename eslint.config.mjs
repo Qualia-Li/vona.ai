@@ -19,15 +19,30 @@ const eslintConfig = [
   {
     rules: {
       "react/no-unused-prop-types": "warn",
-      "react/self-closing-comp": "warn",
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-      "@typescript-eslint/no-explicit-any": "warn",
+      "react/no-unescaped-entities": "warn",
+      "react/self-closing-comp": ["error", { component: true, html: true }],
+      "@typescript-eslint/no-unused-vars": ["warn", { 
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_"
+      }],
+      "@typescript-eslint/no-explicit-any": "error",
       "import/order": [
-        "warn",
+        "error",
         {
           groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
           "newlines-between": "always",
-          alphabetize: { order: "asc" }
+          alphabetize: { 
+            order: "asc",
+            caseInsensitive: true
+          },
+          pathGroups: [
+            {
+              pattern: "@/**",
+              group: "internal",
+              position: "after"
+            }
+          ]
         }
       ]
     }
