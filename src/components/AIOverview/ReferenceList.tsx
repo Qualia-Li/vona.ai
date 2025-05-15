@@ -68,13 +68,6 @@ export default function ReferenceList({ references }: ReferenceListProps) {
                     {reference.snippet}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
-                    {/* <Image
-                      src={getFaviconUrl(reference.link)}
-                      alt={`${reference.source} favicon`}
-                      width={20}
-                      height={20}
-                      className="rounded-full"
-                    /> */}
                     <Favicon url={reference.link} source={reference.source} size={20}/>
                     <span className="text-sm text-gray-400">
                       {reference.source}

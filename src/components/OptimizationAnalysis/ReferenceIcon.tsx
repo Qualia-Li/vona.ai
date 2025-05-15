@@ -1,11 +1,9 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Difficulty, Reference } from "@/types/aiOverview"
 import { getFaviconUrl } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-
+import { Favicon } from "../common/Favicon"
 interface ReferenceIconProps {
   reference: Reference
   difficulty: Difficulty
@@ -39,7 +37,7 @@ export default function ReferenceIcon({ reference, difficulty }: ReferenceIconPr
       <Tooltip>
         <TooltipTrigger>
           <div className={`relative h-8 w-8 rounded-full overflow-hidden border-2 ${getDifficultyColor(difficulty)} transition-all cursor-pointer`} onClick={() => window.open(reference.link, '_blank')}>
-            <img
+            {/* <img
               src={getFaviconUrl(reference.link)}
               alt={`${reference.title} favicon`}
               className="h-full w-full object-cover"
@@ -47,7 +45,8 @@ export default function ReferenceIcon({ reference, difficulty }: ReferenceIconPr
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
               }}
-            />
+            /> */}
+            <Favicon url={reference.link} source={reference.title} size={28}/>
             <div className="hidden absolute inset-0 bg-secondary flex items-center justify-center text-xs font-medium">
               {reference.title.substring(0, 2).toUpperCase()}
             </div>
