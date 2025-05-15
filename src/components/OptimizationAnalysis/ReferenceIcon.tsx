@@ -38,7 +38,7 @@ export default function ReferenceIcon({ reference, difficulty }: ReferenceIconPr
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          <div className={`relative h-8 w-8 rounded-full overflow-hidden border-2 ${getDifficultyColor(difficulty)} hover:shadow-xl transition-all cursor-pointer`} onClick={() => window.open(reference.link, '_blank')}>
+          <div className={`relative h-8 w-8 rounded-full overflow-hidden border-2 ${getDifficultyColor(difficulty)} transition-all cursor-pointer`} onClick={() => window.open(reference.link, '_blank')}>
             <img
               src={getFaviconUrl(reference.link)}
               alt={`${reference.title} favicon`}

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import FAQ from "@/components/FAQ/FAQ";
 import { fetchAIOverview } from "@/lib/api/aiOverview";
+import CompetitorAnalysis from "@/components/CompetitorAnalysis/CompetitorAnalysis";
 
 export default function QueryAnalysisPage() {
   const { aiOverviewData, setAiOverviewData } = useAIOverview();
@@ -150,31 +151,10 @@ export default function QueryAnalysisPage() {
                 referenceList={aiOverviewData?.references || []}
               />
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Competitor Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <Badge>Strong presence on Reddit</Badge>
-                    <span className="text-sm text-muted-foreground">
-                      Multiple active discussions and product recommendations
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Badge>Limited Quora coverage</Badge>
-                    <span className="text-sm text-muted-foreground">
-                      Opportunity for detailed answers and expert insights
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              <CompetitorAnalysis 
+                references={aiOverviewData?.references || []}
+              />
 
-          <TabsContent value="discount-electronics" className="space-y-4">
-            {/* Similar structure as above, with different values */}
           </TabsContent>
         </Tabs>
 
