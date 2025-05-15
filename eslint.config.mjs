@@ -28,7 +28,7 @@ const eslintConfig = [
       }],
       "@typescript-eslint/no-explicit-any": "error",
       "import/order": [
-        "error",
+        "warn",
         {
           groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
           "newlines-between": "always",
