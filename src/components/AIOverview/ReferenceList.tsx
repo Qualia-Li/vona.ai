@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { getFaviconUrl } from "@/lib/utils";
 
 interface ReferenceListProps {
   references: Reference[];
@@ -67,7 +68,7 @@ export default function ReferenceList({ references }: ReferenceListProps) {
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <Image
-                      src={`https://www.google.com/s2/favicons?domain=${reference.link}`}
+                      src={getFaviconUrl(reference.link)}
                       alt={`${reference.source} favicon`}
                       width={20}
                       height={20}

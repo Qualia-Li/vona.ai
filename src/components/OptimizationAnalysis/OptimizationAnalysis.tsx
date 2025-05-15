@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Reference } from "@/types/aiOverview"
-import Image from "next/image"
+import ReferenceIcon from "./ReferenceIcon"
 
 
 interface OptimizationAnalysisProps {
@@ -41,29 +41,19 @@ export default function OptimizationAnalysis({ referenceList }: OptimizationAnal
         <div className="space-y-6">
           <div>
             <div className="text-sm font-medium mb-2">Reference List</div>
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
               {referenceList
                 .sort(
                   (a, b) =>
-                    easinessScores[b.difficulty] -  // easy to hard
+                    easinessScores[b.difficulty] -
                     easinessScores[a.difficulty]
                 )
                 .map((ref) => (
-                  <div
+                  <ReferenceIcon
                     key={ref.index}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm ${getDifficultyColor(
-                      ref.difficulty
-                    )} overflow-hidden`}
-                    title={`${ref.title} - ${ref.difficulty}`}
-                  >
-                    <Image
-                      src={`https://www.google.com/s2/favicons?domain=${ref.link}`}
-                      alt={`${ref.title} favicon`}
-                      width={20}
-                      height={20}
-                      className="rounded-full"
-                    />
-                  </div>
+                    reference={ref}
+                    difficultyColor={getDifficultyColor(ref.difficulty)}
+                  />
                 ))}
             </div>
           </div>
