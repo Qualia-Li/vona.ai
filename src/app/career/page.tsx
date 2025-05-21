@@ -265,8 +265,6 @@ export default function CareersPage() {
               <ul className="list-disc pl-5 space-y-1 text-gray-700">
                 <li>Competitive base salary + uncapped commission</li>
                 <li>Equity package</li>
-                <li>Health, dental, and vision insurance</li>
-                <li>401(k) matching</li>
                 <li>Flexible work environment</li>
                 <li>Professional development budget</li>
               </ul>
