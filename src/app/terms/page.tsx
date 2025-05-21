@@ -107,8 +107,8 @@ export default function TermsPage() {
           <h2 className='text-2xl font-semibold mb-4'>Contact Us</h2>
           <p className='text-gray-600'>
             If you have any questions about these Terms, please contact us at{' '}
-            <a href='mailto:quanlai@enception.ai' className='text-purple-600 hover:text-purple-700'>
-              quanlai@enception.ai
+            <a href='mailto:brittany@enception.ai' className='text-[#6659df] hover:text-[#6659df]/90'>
+              brittany@enception.ai
             </a>
           </p>
         </section>
