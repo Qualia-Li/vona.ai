@@ -4,6 +4,7 @@ import Image from 'next/image';
 
 import './globals.css';
 import { MainNav } from '@/components/layout/main-nav';
+import { Footer } from '@/components/footer'
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
         <main className='container mx-auto py-6'>{children}</main>
+        <Footer />
       </body>
     </html>
   );
