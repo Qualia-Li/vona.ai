@@ -4,6 +4,8 @@ When generating frontend, make sure you do it to maximize the SEO, use server si
 
 Before adding a new type or interface, please check if there is any types under src/types/*.
 
+The brand color is #6659df. For buttons, you dont need to add this color since it is already added. 
+
 Do not add too much comments (only to instruct, don't explain too much).
 
 This is the strucutre of the project:
