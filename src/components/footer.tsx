@@ -37,6 +37,12 @@ export function Footer() {
             >
               Careers
             </Link>
+            <Link
+              href="/terms"
+              className="text-sm leading-6 text-gray-600 hover:text-purple-600"
+            >
+              Terms
+            </Link>
           </nav>
           <p className="text-center text-xs leading-5 text-gray-500">
             &copy; {new Date().getFullYear()} Enception, Inc. All rights reserved.
