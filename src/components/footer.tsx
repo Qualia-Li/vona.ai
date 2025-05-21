@@ -24,24 +24,36 @@ export function Footer() {
           </Link>
         </div>
         <div className="mt-8 md:mt-0 flex flex-col items-start">
-          <nav className="flex justify-center space-x-6 md:order-2 mb-4">
+          <nav className="flex justify-center space-x-6 mb-4">
             <Link
               href="/about"
               className="text-sm leading-6 text-gray-600 hover:text-purple-600"
             >
-              About
+              ℹ️ About
             </Link>
             <Link
               href="/career"
               className="text-sm leading-6 text-gray-600 hover:text-purple-600"
             >
-              Careers
+              💼 Careers
             </Link>
             <Link
               href="/terms"
               className="text-sm leading-6 text-gray-600 hover:text-purple-600"
             >
-              Terms
+              📜 Terms
+            </Link>
+            <Link
+              href="/privacy"
+              className="text-sm leading-6 text-gray-600 hover:text-purple-600"
+            >
+              🔒 Privacy
+            </Link>
+            <Link
+              href="/pricing"
+              className="text-sm leading-6 text-gray-600 hover:text-purple-600"
+            >
+              💰 Pricing
             </Link>
           </nav>
           <p className="text-center text-xs leading-5 text-gray-500">
