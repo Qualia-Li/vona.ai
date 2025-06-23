@@ -140,9 +140,6 @@ export default function CirculSenseDashboard() {
               {landingPages.map((page, i) => (
                 <div key={i}>
                   <Badge className="mb-2">Landing Page</Badge>
-                  <a href={page.url} target="_blank" rel="noopener noreferrer" className="block mb-2 text-lg font-medium text-blue-600 hover:underline">
-                    {page.title}
-                  </a>
                   <LinkPreview url={page.url} title={page.title} />
                 </div>
               ))}
@@ -156,9 +153,6 @@ export default function CirculSenseDashboard() {
               {youtubeContent.map((content, i) => (
                 <div key={i}>
                   <Badge className="mb-2">{content.type === 'video' ? 'Video' : 'Short'}</Badge>
-                  <a href={content.url} target="_blank" rel="noopener noreferrer" className="block mb-2 text-lg font-medium text-blue-600 hover:underline">
-                    {content.title}
-                  </a>
                   <LinkPreview url={content.url} title={content.title} />
                 </div>
               ))}
@@ -175,9 +169,6 @@ export default function CirculSenseDashboard() {
                     <Badge>Reddit</Badge>
                     <span className="text-sm text-gray-500">{post.date}</span>
                   </div>
-                  <a href={post.url} target="_blank" rel="noopener noreferrer" className="block mb-2 text-lg font-medium text-blue-600 hover:underline">
-                    {post.title}
-                  </a>
                   <LinkPreview url={post.url} title={post.title} />
                 </div>
               ))}
