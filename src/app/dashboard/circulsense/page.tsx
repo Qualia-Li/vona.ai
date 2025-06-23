@@ -83,6 +83,27 @@ export default function CirculSenseDashboard() {
     }
   ]
 
+  const indexedCounts = {
+    internet: {
+      platform: "Internet",
+      count: 191,
+      icon: "🌐",
+      searchUrl: "https://www.google.com/search?q=circulsense"
+    },
+    reddit: {
+      platform: "Reddit",
+      count: 14,
+      icon: "🔸",
+      searchUrl: "https://www.google.com/search?q=site:reddit.com+circulsense"
+    },
+    youtube: {
+      platform: "YouTube",
+      count: 9,
+      icon: "📺",
+      searchUrl: "https://www.google.com/search?q=site:youtube.com+circulsense"
+    }
+  }
+
   return (
     <div className="container mx-auto p-6">
       {/* Company Info */}
@@ -163,7 +184,22 @@ export default function CirculSenseDashboard() {
         {/* Indexed Counts Section */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Indexed Counts</h2>
-          <p className="text-gray-600">Coming soon...</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.values(indexedCounts).map((platform) => (
+              <a 
+                key={platform.platform} 
+                href={platform.searchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border rounded-lg p-4 text-center transition-all hover:shadow-lg hover:border-blue-300 cursor-pointer"
+              >
+                <div className="text-4xl mb-2">{platform.icon}</div>
+                <h3 className="text-lg font-medium mb-2">{platform.platform}</h3>
+                <div className="text-3xl font-bold text-blue-600">{platform.count}</div>
+                <div className="text-sm text-gray-600 mt-1">mentions</div>
+              </a>
+            ))}
+          </div>
         </Card>
 
         {/* Traffic Volume Section */}
