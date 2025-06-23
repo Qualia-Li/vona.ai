@@ -12,6 +12,9 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,css,md}\""
   },
   "dependencies": {
+    "@babel/runtime": "^7.27.6",
+    "@babel/runtime-corejs3": "^7.27.6",
+    "@microlink/react": "^5.5.23",
     "@mozilla/readability": "github:mozilla/readability",
     "@radix-ui/react-accordion": "^1.2.10",
     "@radix-ui/react-avatar": "^1.1.9",

@@ -1,6 +1,9 @@
+'use client'
+
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
+import MicrolinkCard from '@microlink/react'
 
 export default function CirculSenseDashboard() {
   const landingPages = [
@@ -133,14 +136,27 @@ export default function CirculSenseDashboard() {
           {/* Landing Pages */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Landing Pages</h3>
-            <div className="grid gap-3">
+            <div className="grid gap-4">
               {landingPages.map((page, i) => (
-                <div key={i} className="border rounded-lg p-3">
-                  <Badge>Landing Page</Badge>
-                  <a href={page.url} className="block mt-2 text-blue-600 hover:underline truncate">
-                    {page.url}
+                <div key={i}>
+                  <Badge className="mb-2">Landing Page</Badge>
+                  <a href={page.url} target="_blank" rel="noopener noreferrer" className="block mb-2 text-lg font-medium text-blue-600 hover:underline">
+                    {page.title}
                   </a>
-                  <p className="text-sm text-gray-600 mt-1">{page.title}</p>
+                  <div className="min-h-[120px]">
+                    <MicrolinkCard 
+                      url={page.url}
+                      size="large"
+                      media={['image', 'logo']}
+                      className="!rounded-lg !border !border-gray-200"
+                      loading={() => (
+                        <div className="p-4 border rounded-lg bg-gray-50">
+                          <p className="font-medium text-gray-900">{page.title}</p>
+                          <p className="text-sm text-gray-500 mt-1 truncate">{page.url}</p>
+                        </div>
+                      )}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -149,14 +165,27 @@ export default function CirculSenseDashboard() {
           {/* YouTube Content */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">YouTube Content</h3>
-            <div className="grid gap-3">
+            <div className="grid gap-4">
               {youtubeContent.map((content, i) => (
-                <div key={i} className="border rounded-lg p-3">
-                  <Badge>{content.type === 'video' ? 'Video' : 'Short'}</Badge>
-                  <a href={content.url} className="block mt-2 text-blue-600 hover:underline truncate">
-                    {content.url}
+                <div key={i}>
+                  <Badge className="mb-2">{content.type === 'video' ? 'Video' : 'Short'}</Badge>
+                  <a href={content.url} target="_blank" rel="noopener noreferrer" className="block mb-2 text-lg font-medium text-blue-600 hover:underline">
+                    {content.title}
                   </a>
-                  <p className="text-sm text-gray-600 mt-1">{content.title}</p>
+                  <div className="min-h-[120px]">
+                    <MicrolinkCard 
+                      url={content.url}
+                      size="large"
+                      media={['image', 'logo']}
+                      className="!rounded-lg !border !border-gray-200"
+                      loading={() => (
+                        <div className="p-4 border rounded-lg bg-gray-50">
+                          <p className="font-medium text-gray-900">{content.title}</p>
+                          <p className="text-sm text-gray-500 mt-1 truncate">{content.url}</p>
+                        </div>
+                      )}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -165,16 +194,30 @@ export default function CirculSenseDashboard() {
           {/* Reddit Posts */}
           <div>
             <h3 className="text-lg font-medium mb-3">Reddit Posts</h3>
-            <div className="grid gap-3">
+            <div className="grid gap-4">
               {redditPosts.map((post, i) => (
-                <div key={i} className="border rounded-lg p-3">
-                  <div className="flex justify-between items-center">
+                <div key={i}>
+                  <div className="flex justify-between items-center mb-2">
                     <Badge>Reddit</Badge>
                     <span className="text-sm text-gray-500">{post.date}</span>
                   </div>
-                  <a href={post.url} className="block mt-2 text-blue-600 hover:underline">
+                  <a href={post.url} target="_blank" rel="noopener noreferrer" className="block mb-2 text-lg font-medium text-blue-600 hover:underline">
                     {post.title}
                   </a>
+                  <div className="min-h-[120px]">
+                    <MicrolinkCard 
+                      url={post.url}
+                      size="large"
+                      media={['image', 'logo']}
+                      className="!rounded-lg !border !border-gray-200"
+                      loading={() => (
+                        <div className="p-4 border rounded-lg bg-gray-50">
+                          <p className="font-medium text-gray-900">{post.title}</p>
+                          <p className="text-sm text-gray-500 mt-1 truncate">{post.url}</p>
+                        </div>
+                      )}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
