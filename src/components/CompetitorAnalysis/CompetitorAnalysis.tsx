@@ -14,7 +14,7 @@ interface CompetitorAnalysisProps {
   references: Reference[];
 }
 
-const COMPETITORS = ['Gamma', 'ChatSlide', 'SlideSpeak', 'SlidesAI'];
+const COMPETITORS: string[] = [];
 const METRICS = ['Authority', 'Traffic'] as const;
 
 export default function CompetitorAnalysis({ references }: CompetitorAnalysisProps) {
