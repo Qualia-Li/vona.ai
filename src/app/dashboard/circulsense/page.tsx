@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
-import MicrolinkCard from '@microlink/react'
+import { LinkPreview } from "@/components/ui/link-preview"
 
 export default function CirculSenseDashboard() {
   const landingPages = [
@@ -143,20 +143,7 @@ export default function CirculSenseDashboard() {
                   <a href={page.url} target="_blank" rel="noopener noreferrer" className="block mb-2 text-lg font-medium text-blue-600 hover:underline">
                     {page.title}
                   </a>
-                  <div className="min-h-[120px]">
-                    <MicrolinkCard 
-                      url={page.url}
-                      size="large"
-                      media={['image', 'logo']}
-                      className="!rounded-lg !border !border-gray-200"
-                      loading={() => (
-                        <div className="p-4 border rounded-lg bg-gray-50">
-                          <p className="font-medium text-gray-900">{page.title}</p>
-                          <p className="text-sm text-gray-500 mt-1 truncate">{page.url}</p>
-                        </div>
-                      )}
-                    />
-                  </div>
+                  <LinkPreview url={page.url} title={page.title} />
                 </div>
               ))}
             </div>
@@ -172,20 +159,7 @@ export default function CirculSenseDashboard() {
                   <a href={content.url} target="_blank" rel="noopener noreferrer" className="block mb-2 text-lg font-medium text-blue-600 hover:underline">
                     {content.title}
                   </a>
-                  <div className="min-h-[120px]">
-                    <MicrolinkCard 
-                      url={content.url}
-                      size="large"
-                      media={['image', 'logo']}
-                      className="!rounded-lg !border !border-gray-200"
-                      loading={() => (
-                        <div className="p-4 border rounded-lg bg-gray-50">
-                          <p className="font-medium text-gray-900">{content.title}</p>
-                          <p className="text-sm text-gray-500 mt-1 truncate">{content.url}</p>
-                        </div>
-                      )}
-                    />
-                  </div>
+                  <LinkPreview url={content.url} title={content.title} />
                 </div>
               ))}
             </div>
@@ -204,20 +178,7 @@ export default function CirculSenseDashboard() {
                   <a href={post.url} target="_blank" rel="noopener noreferrer" className="block mb-2 text-lg font-medium text-blue-600 hover:underline">
                     {post.title}
                   </a>
-                  <div className="min-h-[120px]">
-                    <MicrolinkCard 
-                      url={post.url}
-                      size="large"
-                      media={['image', 'logo']}
-                      className="!rounded-lg !border !border-gray-200"
-                      loading={() => (
-                        <div className="p-4 border rounded-lg bg-gray-50">
-                          <p className="font-medium text-gray-900">{post.title}</p>
-                          <p className="text-sm text-gray-500 mt-1 truncate">{post.url}</p>
-                        </div>
-                      )}
-                    />
-                  </div>
+                  <LinkPreview url={post.url} title={post.title} />
                 </div>
               ))}
             </div>
