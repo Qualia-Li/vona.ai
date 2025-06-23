@@ -86,6 +86,14 @@ export default function CirculSenseDashboard() {
     }
   ]
 
+  const quoraAnswers: { url: string; title: string; date: string }[] = [
+    // {
+    //   url: "https://www.quora.com/What-is-the-best-affordable-smart-ring-other-than-Oura",
+    //   title: "What's the best affordable smart ring other than Oura?",
+    //   date: "11-May"
+    // }
+  ]
+
   const indexedCounts = {
     internet: {
       platform: "Internet",
@@ -173,6 +181,23 @@ export default function CirculSenseDashboard() {
                 </div>
               ))}
             </div>
+          </div>
+        </Card>
+
+        {/* Quora Answers */}
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Quora Answers</h2>
+          <div className="grid gap-4">
+            {quoraAnswers.map((answer, i) => (
+              <div key={i}>
+                <Badge>Quora</Badge>
+                <LinkPreview url={answer.url} title={answer.title} />
+              </div>
+            ))}
+
+            {quoraAnswers.length === 0 && (
+              <p className="text-gray-500">Coming soon...</p>
+            )}
           </div>
         </Card>
 
