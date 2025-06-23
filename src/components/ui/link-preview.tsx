@@ -4,7 +4,7 @@ import { Card } from './card';
 import { Favicon } from '../common/Favicon';
 
 interface OGMetadata {
-  ogImage?: string;
+  ogImage?: string | null;
   ogTitle?: string;
   ogDescription?: string;
 }
@@ -17,6 +17,7 @@ interface LinkPreviewProps {
 
 export function LinkPreview({ url, title, className = '' }: LinkPreviewProps) {
   const [metadata, setMetadata] = useState<OGMetadata | null>(null);
+  const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

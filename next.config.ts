@@ -23,6 +23,15 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "styles.redditmedia.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.redditstatic.com",
+      },
+      // Allow images from any domain for OG images
+      {
+        protocol: "https",
         hostname: "*",
       },
     ],
