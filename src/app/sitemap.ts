@@ -5,14 +5,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: 'https://enception.ai', // Replace with your domain
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: 'weekly',
       priority: 1,
     },
     {
       url: 'https://enception.ai/about',
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.9,
+      priority: 0.8,
     },
     {
       url: 'https://enception.ai/blog',
@@ -42,6 +42,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: 'https://enception.ai/privacy',
       lastModified: new Date(),
       changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: 'https://enception.ai/dashboard/circulsense',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
       priority: 0.9,
     },
 
