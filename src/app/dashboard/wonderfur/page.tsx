@@ -110,42 +110,40 @@ export default function WonderfurDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className='container mx-auto p-6'>
       {/* Company Info */}
-      <div className="flex items-center gap-6 mb-8">
-        <Image 
-          src="/images/wonderfur-logo.png"
-          alt="Wonderfur Logo"
+      <div className='flex items-center gap-6 mb-8'>
+        <Image
+          src='https://wonderfur.vercel.app/images/logo.svg'
+          alt='Wonderfur Logo'
           width={200}
           height={60}
           unoptimized
-          className="object-contain p-2"
+          className='object-contain p-2'
         />
         <div>
-          <h1 className="text-2xl font-bold">Wonderfur</h1>
-          <a href="https://wonderfur.com" className="text-blue-600 hover:underline">
+          <h1 className='text-2xl font-bold'>Wonderfur</h1>
+          <a href='https://wonderfur.com' className='text-blue-600 hover:underline'>
             wonderfur.com
           </a>
         </div>
       </div>
 
       {/* Main Sections */}
-      <div className="grid gap-6">
+      <div className='grid gap-6'>
         {/* Content Created Section */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Content Created</h2>
-          
+        <Card className='p-6'>
+          <h2 className='text-xl font-semibold mb-4'>Content Created</h2>
+
           {/* Landing Pages */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3">Landing Pages</h3>
-            <div className="grid gap-4">
+          <div className='mb-6'>
+            <h3 className='text-lg font-medium mb-3'>Landing Pages</h3>
+            <div className='grid gap-4'>
               {landingPages.map((page, i) => (
                 <div key={i}>
-                  <div className="flex justify-between items-center mb-2">
-                    <Badge className="mb-2">Landing Page</Badge>
-                    {page.status === "deploying" && (
-                      <Badge variant="secondary">Deploying...</Badge>
-                    )}
+                  <div className='flex justify-between items-center mb-2'>
+                    <Badge className='mb-2'>Landing Page</Badge>
+                    {page.status === 'deploying' && <Badge variant='secondary'>Deploying...</Badge>}
                   </div>
                   <LinkPreview url={page.url} title={page.title} />
                 </div>
@@ -154,12 +152,12 @@ export default function WonderfurDashboard() {
           </div>
 
           {/* YouTube Content */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3">YouTube Content</h3>
-            <div className="grid gap-4">
+          <div className='mb-6'>
+            <h3 className='text-lg font-medium mb-3'>YouTube Content</h3>
+            <div className='grid gap-4'>
               {youtubeContent.map((content, i) => (
                 <div key={i}>
-                  <Badge className="mb-2">{content.type === 'video' ? 'Video' : 'Short'}</Badge>
+                  <Badge className='mb-2'>{content.type === 'video' ? 'Video' : 'Short'}</Badge>
                   <LinkPreview url={content.url} title={content.title} />
                 </div>
               ))}
@@ -168,13 +166,13 @@ export default function WonderfurDashboard() {
 
           {/* Reddit Posts */}
           <div>
-            <h3 className="text-lg font-medium mb-3">Reddit Posts</h3>
-            <div className="grid gap-4">
+            <h3 className='text-lg font-medium mb-3'>Reddit Posts</h3>
+            <div className='grid gap-4'>
               {redditPosts.map((post, i) => (
                 <div key={i}>
-                  <div className="flex justify-between items-center mb-2">
+                  <div className='flex justify-between items-center mb-2'>
                     <Badge>Reddit</Badge>
-                    <span className="text-sm text-gray-500">{post.date}</span>
+                    <span className='text-sm text-gray-500'>{post.date}</span>
                   </div>
                   <LinkPreview url={post.url} title={post.title} />
                 </div>
@@ -184,9 +182,9 @@ export default function WonderfurDashboard() {
         </Card>
 
         {/* Quora Answers */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Quora Answers</h2>
-          <div className="grid gap-4">
+        <Card className='p-6'>
+          <h2 className='text-xl font-semibold mb-4'>Quora Answers</h2>
+          <div className='grid gap-4'>
             {quoraAnswers.map((answer, i) => (
               <div key={i}>
                 <Badge>Quora</Badge>
@@ -194,39 +192,37 @@ export default function WonderfurDashboard() {
               </div>
             ))}
 
-            {quoraAnswers.length === 0 && (
-              <p className="text-gray-500">Coming soon...</p>
-            )}
+            {quoraAnswers.length === 0 && <p className='text-gray-500'>Coming soon...</p>}
           </div>
         </Card>
 
         {/* Indexed Counts Section */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Indexed Counts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className='p-6'>
+          <h2 className='text-xl font-semibold mb-4'>Indexed Counts</h2>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             {Object.values(indexedCounts).map((platform) => (
-              <a 
-                key={platform.platform} 
+              <a
+                key={platform.platform}
                 href={platform.searchUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border rounded-lg p-4 text-center transition-all hover:shadow-lg hover:border-blue-300 cursor-pointer"
+                target='_blank'
+                rel='noopener noreferrer'
+                className='border rounded-lg p-4 text-center transition-all hover:shadow-lg hover:border-blue-300 cursor-pointer'
               >
-                <div className="text-4xl mb-2">{platform.icon}</div>
-                <h3 className="text-lg font-medium mb-2">{platform.platform}</h3>
-                <div className="text-3xl font-bold text-blue-600">{platform.count}</div>
-                <div className="text-sm text-gray-600 mt-1">mentions</div>
+                <div className='text-4xl mb-2'>{platform.icon}</div>
+                <h3 className='text-lg font-medium mb-2'>{platform.platform}</h3>
+                <div className='text-3xl font-bold text-blue-600'>{platform.count}</div>
+                <div className='text-sm text-gray-600 mt-1'>mentions</div>
               </a>
             ))}
           </div>
         </Card>
 
         {/* Traffic Volume Section */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Traffic Volume</h2>
-          <p className="text-gray-600">Coming soon...</p>
+        <Card className='p-6'>
+          <h2 className='text-xl font-semibold mb-4'>Traffic Volume</h2>
+          <p className='text-gray-600'>Coming soon...</p>
         </Card>
       </div>
     </div>
-  )
+  );
 } 
