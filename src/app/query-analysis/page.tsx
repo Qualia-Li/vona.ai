@@ -8,6 +8,7 @@ import AIOverviewCard from '@/components/AIOverview/AIOverviewCard';
 import CompetitorAnalysis from '@/components/CompetitorAnalysis/CompetitorAnalysis';
 import FAQ from '@/components/FAQ/FAQ';
 import OptimizationAnalysis from '@/components/OptimizationAnalysis/OptimizationAnalysis';
+import OrganicResults from '@/components/OrganicResults/OrganicResults';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useKeywordsStore } from '@/lib/store/keywordsStore';
 import { useAIOverview } from '@/lib/store/useAIOverview';
+import { OrganicResult } from '@/types/aiOverview';
 
 import { fetchAIOverview } from '@/lib/api/aiOverview';
 
@@ -35,6 +37,7 @@ export default function QueryAnalysisPage() {
   const [timeFilter, setTimeFilter] = useState('none');
   const [locationFilter, setLocationFilter] = useState('none');
   const [userLocation, setUserLocation] = useState<LocationData | null>(null);
+  const [organicResults, setOrganicResults] = useState<OrganicResult[]>([]);
 
   // Get user's location
   useEffect(() => {
@@ -170,6 +173,55 @@ export default function QueryAnalysisPage() {
     },
   ];
 
+  const handleAnalysis = async () => {
+    try {
+      setIsAnalyzing(true);
+      setError(null);
+      setAiOverviewData([], []);
+      setOrganicResults([]);
+      let fullQuery = `${questionWord} ${query}`.trim();
+
+                // Add time filter to query if selected
+                if (timeFilter !== 'none') {
+                  const [year, month] = timeFilter.split('-');
+                  if (month) {
+                    const date = new Date(parseInt(year), parseInt(month) - 1);
+                    fullQuery += ` in ${date.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`;
+                  } else {
+                    fullQuery += ` in ${year}`;
+                  }
+                }
+
+                // Add location filter to query if selected
+                if (locationFilter !== 'none' && userLocation) {
+                  let locationString = '';
+                  switch (locationFilter) {
+                    case 'country':
+                      locationString = userLocation.country;
+                      break;
+                    case 'state':
+                      locationString = `${userLocation.state}, ${userLocation.country}`;
+                      break;
+                    case 'city':
+                      locationString = `${userLocation.city}, ${userLocation.state}, ${userLocation.country}`;
+                      break;
+                  }
+                  if (locationString) {
+                    fullQuery += ` in ${locationString}`;
+                  }
+                }
+
+                console.log('Fetching AI Overview for query:', fullQuery);
+                const data = await fetchAIOverview(fullQuery);
+                setAiOverviewData(data?.ai_overview.text_blocks, data?.ai_overview.references);
+                setOrganicResults(data?.organic_results || []);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An unknown error occurred');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   return (
     <div>
       <div className='mb-8'>
@@ -239,52 +291,7 @@ export default function QueryAnalysisPage() {
           </Select>
           
           <Button
-            onClick={async () => {
-              try {
-                setIsAnalyzing(true);
-                setError(null);
-                setAiOverviewData([], []);
-                let fullQuery = `${questionWord} ${query}`.trim();
-
-                // Add time filter to query if selected
-                if (timeFilter !== 'none') {
-                  const [year, month] = timeFilter.split('-');
-                  if (month) {
-                    const date = new Date(parseInt(year), parseInt(month) - 1);
-                    fullQuery += ` in ${date.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`;
-                  } else {
-                    fullQuery += ` in ${year}`;
-                  }
-                }
-
-                // Add location filter to query if selected
-                if (locationFilter !== 'none' && userLocation) {
-                  let locationString = '';
-                  switch (locationFilter) {
-                    case 'country':
-                      locationString = userLocation.country;
-                      break;
-                    case 'state':
-                      locationString = `${userLocation.state}, ${userLocation.country}`;
-                      break;
-                    case 'city':
-                      locationString = `${userLocation.city}, ${userLocation.state}, ${userLocation.country}`;
-                      break;
-                  }
-                  if (locationString) {
-                    fullQuery += ` in ${locationString}`;
-                  }
-                }
-
-                console.log('Fetching AI Overview for query:', fullQuery);
-                const data = await fetchAIOverview(fullQuery);
-                setAiOverviewData(data?.ai_overview.text_blocks, data?.ai_overview.references);
-              } catch (error) {
-                setError(error instanceof Error ? error.message : 'An unknown error occurred');
-              } finally {
-                setIsAnalyzing(false);
-              }
-            }}
+            onClick={handleAnalysis}
             disabled={isAnalyzing}
           >
             {isAnalyzing ? 'Analyzing...' : 'Analyze'}
@@ -311,7 +318,12 @@ export default function QueryAnalysisPage() {
         <AIOverviewCard data={aiOverviewData} />
 
         <Tabs defaultValue='best-online-shopping' className='space-y-4'>
-          <TabsContent value='best-online-shopping' className='space-y-4'>
+          <TabsList>
+            <TabsTrigger value="ai-overview">AI Overview</TabsTrigger>
+            <TabsTrigger value="organic-results">Organic Results</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="ai-overview" className='space-y-4'>
             {/* <Card>
                 <CardHeader>
                   <CardTitle>AI Overview Analysis</CardTitle>
@@ -355,6 +367,10 @@ export default function QueryAnalysisPage() {
             <OptimizationAnalysis referenceList={aiOverviewData?.references || []} />
 
             <CompetitorAnalysis references={aiOverviewData?.references || []} />
+          </TabsContent>
+
+          <TabsContent value="organic-results" className='space-y-4'>
+            <OrganicResults results={organicResults} />
           </TabsContent>
         </Tabs>
 
