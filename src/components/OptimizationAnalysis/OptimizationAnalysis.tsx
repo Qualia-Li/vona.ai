@@ -18,6 +18,21 @@ export default function OptimizationAnalysis({ referenceList }: OptimizationAnal
     easy: 100,
   };
 
+  if (!referenceList || referenceList.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Optimization Analysis</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-muted-foreground py-8">
+            Run an AI Overview query to see optimization analysis for your target keywords.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const averageEasiness = Math.round(
     referenceList.reduce((acc, ref) => acc + easinessScores[ref.difficulty], 0) / referenceList.length,
   );

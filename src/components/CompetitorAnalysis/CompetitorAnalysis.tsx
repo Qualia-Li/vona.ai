@@ -36,6 +36,22 @@ export default function CompetitorAnalysis({ references }: CompetitorAnalysisPro
     });
   }, [references]);
 
+  if (!references || references.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Competitor Analysis</CardTitle>
+          <p className='text-sm text-muted-foreground'>Accuracy is continuously improving as we gather more data</p>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-muted-foreground py-8">
+            Run an AI Overview query to see competitor analysis for your target keywords.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
