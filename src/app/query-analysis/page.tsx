@@ -116,6 +116,7 @@ export default function QueryAnalysisPage() {
             <SelectContent>
               <SelectItem value='what is the best'>What is/are the best</SelectItem>
               <SelectItem value='what is'>What is/are</SelectItem>
+              <SelectItem value='review of the best'>Review of the best</SelectItem>
               <SelectItem value='review of'>Review of</SelectItem>
               <SelectItem value='how to'>How to</SelectItem>
             </SelectContent>
