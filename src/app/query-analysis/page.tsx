@@ -25,6 +25,7 @@ export default function QueryAnalysisPage() {
   const [query, setQuery] = useState('');
   const [questionWord, setQuestionWord] = useState('what is the best');
   const [error, setError] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleKeywordClick = (term: string) => {
     setQuery(term);
@@ -128,6 +129,7 @@ export default function QueryAnalysisPage() {
           <Button
             onClick={async () => {
               try {
+                setIsAnalyzing(true);
                 setError(null);
                 setAiOverviewData([], []);
                 const fullQuery = `${questionWord} ${query}`.trim();
@@ -136,10 +138,13 @@ export default function QueryAnalysisPage() {
                 setAiOverviewData(data.text_blocks, data.references);
               } catch (error) {
                 setError(error instanceof Error ? error.message : 'An unknown error occurred');
+              } finally {
+                setIsAnalyzing(false);
               }
             }}
+            disabled={isAnalyzing}
           >
-            Analyze
+            {isAnalyzing ? 'Analyzing...' : 'Analyze'}
           </Button>
         </div>
 

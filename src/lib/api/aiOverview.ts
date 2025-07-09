@@ -10,7 +10,8 @@ export async function fetchAIOverview(query: string): Promise<AIOverview> {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to fetch AI overview data');
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to fetch AI overview data');
   }
 
   const data = await response.json();
