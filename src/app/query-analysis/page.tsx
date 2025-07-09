@@ -65,6 +65,26 @@ export default function QueryAnalysisPage() {
       answer:
         "URL placement in AI Overviews can fluctuate as Google's algorithms evolve. Regular monitoring helps understand these patterns and adapt your content strategy accordingly.",
     },
+    {
+      question: 'Which websites and platforms are most effective for AI Overviews?',
+      answer:
+        'Google tends to favor content from YouTube, Medium, Quora, Reddit, and sometimes LinkedIn. These platforms are considered the most effective channels for AI visibility due to their high-quality user-generated content and established authority.',
+    },
+    {
+      question: 'How long does it take to see optimization results?',
+      answer:
+        'The optimization process takes time to show results. Google typically needs 1 month to index new content, followed by approximately 3 months to rank and summarize it. Around this time, you should see an increase in traffic proportional to your keyword volume.',
+    },
+    {
+      question: 'Do different AI search engines prefer different sources?',
+      answer:
+        'Yes, different search engines have different preferences. For example, Grok tends to favor X (Twitter) posts. However, Reddit and Quora content are generally accessible and favored by most AI search engines due to their comprehensive discussion format.',
+    },
+    {
+      question: 'How is content hosted for brand optimization?',
+      answer:
+        'Content follows two approaches: "off-page SEO" content (like Reddit posts) is hosted on third-party platforms, while "on-page SEO" content is typically hosted on the brand\'s website. Our team can also provide hosting solutions with minor redirection changes if needed.',
+    },
   ];
 
   return (
