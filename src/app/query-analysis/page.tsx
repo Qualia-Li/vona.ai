@@ -145,7 +145,7 @@ export default function QueryAnalysisPage() {
 
         {/* Suggested Keywords */}
         <div className='space-y-2'>
-          <p className='text-sm text-muted-foreground'>Suggested keywords for you:</p>
+          <p className='text-sm text-muted-foreground'>Your keywords:</p>
           <div className='flex flex-wrap gap-2'>
             {keywords?.map((keyword, index) => (
               <Badge
