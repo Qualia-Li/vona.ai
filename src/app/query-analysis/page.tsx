@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 
-import AIOverview from '@/components/AIOverview/AIOverviewCard';
 import AIOverviewCard from '@/components/AIOverview/AIOverviewCard';
 import CompetitorAnalysis from '@/components/CompetitorAnalysis/CompetitorAnalysis';
 import FAQ from '@/components/FAQ/FAQ';
@@ -11,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useKeywordsStore } from '@/lib/store/keywordsStore';
@@ -105,6 +103,8 @@ export default function QueryAnalysisPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='what is'>What is</SelectItem>
+              <SelectItem value='what is'>What is the best</SelectItem>
+              <SelectItem value='what is'>Review of</SelectItem>
               <SelectItem value='how to'>How to</SelectItem>
             </SelectContent>
           </Select>
