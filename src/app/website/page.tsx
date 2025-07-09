@@ -17,6 +17,7 @@ export default function WebsiteInputPage() {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const addKeywords = useKeywordsStore((state) => state.addKeywords);
+  const setKeywords = useKeywordsStore((state) => state.setKeywords);
   const existingKeywords = useKeywordsStore((state) => state.keywords);
   const clearKeywords = useKeywordsStore((state) => state.clearKeywords);
   const [keywordResults, setKeywordResults] = useState<KeywordResponse | null>(null);
@@ -40,7 +41,7 @@ export default function WebsiteInputPage() {
 
       const data = await response.json();
       setKeywordResults(data);
-      addKeywords(data.keywords.map((keyword: string) => ({
+      setKeywords(data.keywords.map((keyword: string) => ({
         id: Math.random().toString(36).substring(7),
         term: keyword,
         volume: 0,

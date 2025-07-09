@@ -7,6 +7,7 @@ interface KeywordsStore {
   keywords: Keyword[];
   addKeyword: (keyword: Keyword) => void;
   addKeywords: (keywords: Keyword[]) => void;
+  setKeywords: (keywords: Keyword[]) => void;
   deleteKeyword: (id: string) => void;
   updateKeyword: (id: string, keyword: Partial<Keyword>) => void;
   clearKeywords: () => void;
@@ -24,6 +25,7 @@ export const useKeywordsStore = create<KeywordsStore>()(
         set((state) => ({
           keywords: [...state.keywords, ...newKeywords],
         })),
+      setKeywords: (newKeywords: Keyword[]) => set({ keywords: newKeywords }),
       deleteKeyword: (id: string) =>
         set((state) => ({
           keywords: state.keywords.filter((k) => k.id !== id),
