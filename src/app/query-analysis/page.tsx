@@ -19,6 +19,12 @@ import { useAIOverview } from '@/lib/store/useAIOverview';
 
 import { fetchAIOverview } from '@/lib/api/aiOverview';
 
+interface LocationData {
+  city: string;
+  state: string;
+  country: string;
+}
+
 export default function QueryAnalysisPage() {
   const { aiOverviewData, setAiOverviewData } = useAIOverview();
   const { keywords } = useKeywordsStore();
@@ -26,6 +32,81 @@ export default function QueryAnalysisPage() {
   const [questionWord, setQuestionWord] = useState('what is the best');
   const [error, setError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [timeFilter, setTimeFilter] = useState('none');
+  const [locationFilter, setLocationFilter] = useState('none');
+  const [userLocation, setUserLocation] = useState<LocationData | null>(null);
+
+  // Get user's location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      const locationTimeout = setTimeout(() => {
+        console.warn('Location request timed out');
+      }, 10000);
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          clearTimeout(locationTimeout);
+          try {
+            const response = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`
+            );
+            
+            if (!response.ok) {
+              throw new Error('Failed to fetch location data');
+            }
+            
+            const data = await response.json();
+            setUserLocation({
+              city: data.city,
+              state: data.principalSubdivision,
+              country: data.countryCode
+            });
+          } catch (error) {
+            console.error('Error getting location details:', error);
+          }
+        },
+        (error) => {
+          clearTimeout(locationTimeout);
+          console.error('Geolocation error:', error.message);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+  }, []);
+
+  // Generate time options based on current date
+  const generateTimeOptions = () => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth(); // 0-11
+
+    return [
+      { value: 'none', label: 'No time filter' },
+      { value: currentYear.toString(), label: `In ${currentYear}` },
+      { 
+        value: `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}`,
+        label: `In ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
+      }
+    ];
+  };
+
+  // Generate location options based on user's location
+  const generateLocationOptions = () => {
+    if (!userLocation) {
+      return [{ value: 'none', label: 'No location filter' }];
+    }
+
+    return [
+      { value: 'none', label: 'No location filter' },
+      { value: 'country', label: `In ${userLocation.country}` },
+      { value: 'state', label: `In ${userLocation.state}, ${userLocation.country}` },
+      { value: 'city', label: `In ${userLocation.city}, ${userLocation.state}, ${userLocation.country}` }
+    ];
+  };
 
   const handleKeywordClick = (term: string) => {
     setQuery(term);
@@ -121,19 +202,80 @@ export default function QueryAnalysisPage() {
               <SelectItem value='how to'>How to</SelectItem>
             </SelectContent>
           </Select>
+
           <Input
             placeholder='Enter keyword to analyze...'
             className='max-w-xl'
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
+
+          {/* Simplified Time Filter */}
+          <Select value={timeFilter} onValueChange={setTimeFilter}>
+            <SelectTrigger className='w-[180px]'>
+              <SelectValue placeholder='Time filter' />
+            </SelectTrigger>
+            <SelectContent>
+              {generateTimeOptions().map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Updated Location Filter */}
+          <Select value={locationFilter} onValueChange={setLocationFilter}>
+            <SelectTrigger className='w-[250px]'>
+              <SelectValue placeholder='Location filter' />
+            </SelectTrigger>
+            <SelectContent>
+              {generateLocationOptions().map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
           <Button
             onClick={async () => {
               try {
                 setIsAnalyzing(true);
                 setError(null);
                 setAiOverviewData([], []);
-                const fullQuery = `${questionWord} ${query}`.trim();
+                let fullQuery = `${questionWord} ${query}`.trim();
+
+                // Add time filter to query if selected
+                if (timeFilter !== 'none') {
+                  const [year, month] = timeFilter.split('-');
+                  if (month) {
+                    const date = new Date(parseInt(year), parseInt(month) - 1);
+                    fullQuery += ` in ${date.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`;
+                  } else {
+                    fullQuery += ` in ${year}`;
+                  }
+                }
+
+                // Add location filter to query if selected
+                if (locationFilter !== 'none' && userLocation) {
+                  let locationString = '';
+                  switch (locationFilter) {
+                    case 'country':
+                      locationString = userLocation.country;
+                      break;
+                    case 'state':
+                      locationString = `${userLocation.state}, ${userLocation.country}`;
+                      break;
+                    case 'city':
+                      locationString = `${userLocation.city}, ${userLocation.state}, ${userLocation.country}`;
+                      break;
+                  }
+                  if (locationString) {
+                    fullQuery += ` in ${locationString}`;
+                  }
+                }
+
                 console.log('Fetching AI Overview for query:', fullQuery);
                 const data = await fetchAIOverview(fullQuery);
                 setAiOverviewData(data.text_blocks, data.references);
