@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { useKeywordsStore } from '@/lib/store/keywordsStore';
 
 interface KeywordResponse {
   url: string;
@@ -15,6 +16,9 @@ interface KeywordResponse {
 export default function WebsiteInputPage() {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const addKeywords = useKeywordsStore((state) => state.addKeywords);
+  const existingKeywords = useKeywordsStore((state) => state.keywords);
+  const clearKeywords = useKeywordsStore((state) => state.clearKeywords);
   const [keywordResults, setKeywordResults] = useState<KeywordResponse | null>(null);
 
   const handleAnalyze = async (e: React.FormEvent) => {
@@ -36,6 +40,14 @@ export default function WebsiteInputPage() {
 
       const data = await response.json();
       setKeywordResults(data);
+      addKeywords(data.keywords.map((keyword: string) => ({
+        id: Math.random().toString(36).substring(7),
+        term: keyword,
+        volume: 0,
+        aiOverviewLikelihood: 0,
+        optimizationDifficulty: 0,
+        purchaseIntent: 0,
+      })));
     } catch (error) {
       console.error('Error analyzing website:', error);
       alert('Failed to analyze website. Please try again.');
@@ -82,19 +94,14 @@ export default function WebsiteInputPage() {
           <CardHeader>
             <CardTitle>Generated Keywords</CardTitle>
             <CardDescription>
-              {keywordResults.success 
-                ? `Keywords generated for ${keywordResults.url}`
-                : keywordResults.message}
+              {keywordResults.success ? `Keywords generated for ${keywordResults.url}` : keywordResults.message}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {keywordResults.keywords.length > 0 ? (
               <div className='grid gap-2'>
                 {keywordResults.keywords.map((keyword, index) => (
-                  <div 
-                    key={index} 
-                    className='p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors'
-                  >
+                  <div key={index} className='p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors'>
                     <div className='font-medium'>{keyword}</div>
                   </div>
                 ))}
@@ -102,6 +109,31 @@ export default function WebsiteInputPage() {
             ) : (
               <p className='text-muted-foreground'>No keywords generated.</p>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {existingKeywords.length > 0 && (
+        <Card className='mt-8'>
+          <CardHeader>
+            <CardTitle>Existing Keywords</CardTitle>
+            <CardDescription>Keywords from previous analyses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-4'>
+              <div className='flex justify-end'>
+                <Button variant='outline' onClick={clearKeywords}>
+                  Clear All
+                </Button>
+              </div>
+              <div className='grid gap-2'>
+                {existingKeywords.map((keyword) => (
+                  <div key={keyword.id} className='p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors'>
+                    <div className='font-medium'>{keyword.term}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}
