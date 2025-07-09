@@ -1,29 +1,41 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { analyzeWebsite } from '@/lib/api/website';
-import { useWebsiteStore } from '@/lib/store/websiteStore';
-import type { WebsiteStore } from '@/lib/store/websiteStore';
+
+interface KeywordResponse {
+  url: string;
+  keywords: string[];
+  success: boolean;
+  message: string;
+}
 
 export default function WebsiteInputPage() {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const setResults = useWebsiteStore((state: WebsiteStore) => state.setResults);
+  const [keywordResults, setKeywordResults] = useState<KeywordResponse | null>(null);
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const data = await analyzeWebsite(url);
-      setResults(data);
-      router.push(`/keywords?url=${encodeURIComponent(url)}`);
+      const response = await fetch('/api/keywords', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze website');
+      }
+
+      const data = await response.json();
+      setKeywordResults(data);
     } catch (error) {
       console.error('Error analyzing website:', error);
       alert('Failed to analyze website. Please try again.');
@@ -43,7 +55,7 @@ export default function WebsiteInputPage() {
         <CardHeader>
           <CardTitle>Website Analysis</CardTitle>
           <CardDescription>
-            We'll analyze your website's metadata, content, and current search visibility.
+            We'll analyze your website's metadata, content, and generate relevant keywords.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -64,6 +76,35 @@ export default function WebsiteInputPage() {
           </form>
         </CardContent>
       </Card>
+
+      {keywordResults && (
+        <Card className='mt-8'>
+          <CardHeader>
+            <CardTitle>Generated Keywords</CardTitle>
+            <CardDescription>
+              {keywordResults.success 
+                ? `Keywords generated for ${keywordResults.url}`
+                : keywordResults.message}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {keywordResults.keywords.length > 0 ? (
+              <div className='grid gap-2'>
+                {keywordResults.keywords.map((keyword, index) => (
+                  <div 
+                    key={index} 
+                    className='p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors'
+                  >
+                    <div className='font-medium'>{keyword}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className='text-muted-foreground'>No keywords generated.</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className='mt-8 grid gap-4'>
         <Card>
