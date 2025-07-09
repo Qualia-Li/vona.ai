@@ -1,11 +1,13 @@
 'use client';
 
-import { ArrowUpDown, LayoutGrid, Table as TableIcon } from 'lucide-react';
+import { ArrowUpDown, LayoutGrid, Plus, Table as TableIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Toggle } from '@/components/ui/toggle';
@@ -18,9 +20,12 @@ type ViewMode = 'table' | 'card';
 export default function KeywordsPage() {
   const keywords = useKeywordsStore((state) => state.keywords);
   const deleteKeyword = useKeywordsStore((state) => state.deleteKeyword);
+  const addKeyword = useKeywordsStore((state) => state.addKeyword);
   const [sortField, setSortField] = useState<SortField>('volume');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newKeyword, setNewKeyword] = useState('');
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -29,6 +34,22 @@ export default function KeywordsPage() {
       setSortField(field);
       setSortOrder('desc');
     }
+  };
+
+  const handleAddKeyword = () => {
+    if (!newKeyword.trim()) return;
+
+    addKeyword({
+      id: crypto.randomUUID(),
+      term: newKeyword.trim(),
+      volume: 0,
+      aiOverviewLikelihood: 0,
+      optimizationDifficulty: 0,
+      isCustom: true
+    });
+
+    setNewKeyword('');
+    setIsDialogOpen(false);
   };
 
   const sortedKeywords = [...keywords].sort((a, b) => {
@@ -64,12 +85,30 @@ export default function KeywordsPage() {
               <LayoutGrid className='h-4 w-4' />
             </Toggle>
           </div>
-          <Button className='relative group'>
-            Add Custom Keyword
-            <span className='absolute -top-8 left-1/2 -translate-x-1/2 bg-secondary-foreground text-secondary px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap'>
-              Coming soon...
-            </span>
-          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Custom Keyword
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add Custom Keyword</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="flex items-center gap-4">
+                  <Input
+                    placeholder="Enter keyword..."
+                    value={newKeyword}
+                    onChange={(e) => setNewKeyword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddKeyword()}
+                  />
+                  <Button onClick={handleAddKeyword} disabled={!newKeyword.trim()}>Add</Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -157,7 +196,7 @@ export default function KeywordsPage() {
                     </div>
                   </TableCell>
                   <TableCell className='text-right'>
-                    <Button variant='ghost' size='sm' onClick={() => deleteKeyword(keyword.id)}>
+                    <Button variant='outline' size='sm' onClick={() => deleteKeyword(keyword.id)}>
                       Delete
                     </Button>
                   </TableCell>
