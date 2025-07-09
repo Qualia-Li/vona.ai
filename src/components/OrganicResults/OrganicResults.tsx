@@ -8,8 +8,18 @@ interface OrganicResultsProps {
 }
 
 export default function OrganicResults({ results }: OrganicResultsProps) {
+
   if (!results?.length) {
-    return null;
+    return (
+      <Card className='p-6'>
+        <div className='text-center space-y-2'>
+          <p className='text-lg font-medium text-muted-foreground'>No organic results found</p>
+          <p className='text-sm text-muted-foreground'>
+            Enter a keyword in the search box above and click "Analyze" to see organic search results
+          </p>
+        </div>
+      </Card>
+    );
   }
 
   return (

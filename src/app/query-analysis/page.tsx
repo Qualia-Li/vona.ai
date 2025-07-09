@@ -231,14 +231,6 @@ export default function QueryAnalysisPage() {
         </p>
       </div>
 
-      {error && (
-        <Alert variant='destructive' className='mb-4'>
-          <AlertCircle className='h-4 w-4' />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
       <div className='space-y-6'>
         {/* Search Input Section */}
         <div className='flex gap-2'>
@@ -289,11 +281,8 @@ export default function QueryAnalysisPage() {
               ))}
             </SelectContent>
           </Select>
-          
-          <Button
-            onClick={handleAnalysis}
-            disabled={isAnalyzing}
-          >
+
+          <Button onClick={handleAnalysis} disabled={isAnalyzing}>
             {isAnalyzing ? 'Analyzing...' : 'Analyze'}
           </Button>
         </div>
@@ -315,61 +304,28 @@ export default function QueryAnalysisPage() {
           </div>
         </div>
 
-        <AIOverviewCard data={aiOverviewData} />
-
-        <Tabs defaultValue='best-online-shopping' className='space-y-4'>
+        <Tabs defaultValue='ai-overview' className='space-y-2'>
+          <p className='text-sm text-muted-foreground'>Show results for:</p>
           <TabsList>
-            <TabsTrigger value="ai-overview">AI Overview</TabsTrigger>
-            <TabsTrigger value="organic-results">Organic Results</TabsTrigger>
+            <TabsTrigger value='ai-overview'>Google AI Overview</TabsTrigger>
+            <TabsTrigger value='organic-results'>Google Organic Results</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="ai-overview" className='space-y-4'>
-            {/* <Card>
-                <CardHeader>
-                  <CardTitle>AI Overview Analysis</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="text-sm font-medium mb-2">
-                        AI Trigger Potential
-                      </div>
-                      <Progress value={78} className="h-2" />
-                      <div className="text-sm text-muted-foreground mt-1">
-                        78%
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium mb-2">
-                        Content Gaps
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">Pricing comparison</Badge>
-                          <span className="text-sm text-muted-foreground">
-                            High priority
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">
-                            Technical specifications
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">
-                            Medium priority
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card> */}
-
+          <TabsContent value='ai-overview' className='space-y-4'>
+            {error && (
+              <Alert variant='destructive' className='mb-4'>
+                <AlertCircle className='h-4 w-4' />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            <AIOverviewCard data={aiOverviewData} />
             <OptimizationAnalysis referenceList={aiOverviewData?.references || []} />
 
             <CompetitorAnalysis references={aiOverviewData?.references || []} />
           </TabsContent>
 
-          <TabsContent value="organic-results" className='space-y-4'>
+          <TabsContent value='organic-results' className='space-y-4'>
             <OrganicResults results={organicResults} />
           </TabsContent>
         </Tabs>
