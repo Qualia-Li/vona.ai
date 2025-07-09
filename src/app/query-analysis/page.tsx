@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import AIOverviewCard from '@/components/AIOverview/AIOverviewCard';
 import CompetitorAnalysis from '@/components/CompetitorAnalysis/CompetitorAnalysis';
@@ -21,7 +23,8 @@ export default function QueryAnalysisPage() {
   const { aiOverviewData, setAiOverviewData } = useAIOverview();
   const { keywords } = useKeywordsStore();
   const [query, setQuery] = useState('');
-  const [questionWord, setQuestionWord] = useState('what is');
+  const [questionWord, setQuestionWord] = useState('what is the best');
+  const [error, setError] = useState<string | null>(null);
 
   const handleKeywordClick = (term: string) => {
     setQuery(term);
@@ -94,17 +97,25 @@ export default function QueryAnalysisPage() {
         </p>
       </div>
 
+      {error && (
+        <Alert variant='destructive' className='mb-4'>
+          <AlertCircle className='h-4 w-4' />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <div className='space-y-6'>
         {/* Search Input Section */}
         <div className='flex gap-2'>
           <Select value={questionWord} onValueChange={setQuestionWord}>
-            <SelectTrigger className='w-[180px]'>
+            <SelectTrigger className='w-[240px]'>
               <SelectValue placeholder='Select prefix' />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='what is'>What is</SelectItem>
-              <SelectItem value='what is'>What is the best</SelectItem>
-              <SelectItem value='what is'>Review of</SelectItem>
+              <SelectItem value='what is the best'>What is/are the best</SelectItem>
+              <SelectItem value='what is'>What is/are</SelectItem>
+              <SelectItem value='review of'>Review of</SelectItem>
               <SelectItem value='how to'>How to</SelectItem>
             </SelectContent>
           </Select>
@@ -115,13 +126,17 @@ export default function QueryAnalysisPage() {
             onChange={(e) => setQuery(e.target.value)}
           />
           <Button
-            onClick={() => {
-              setAiOverviewData([], []);
-              const fullQuery = `${questionWord} ${query}`.trim();
-              console.log('Fetching AI Overview for query:', fullQuery);
-              fetchAIOverview(fullQuery).then((data) => {
+            onClick={async () => {
+              try {
+                setError(null);
+                setAiOverviewData([], []);
+                const fullQuery = `${questionWord} ${query}`.trim();
+                console.log('Fetching AI Overview for query:', fullQuery);
+                const data = await fetchAIOverview(fullQuery);
                 setAiOverviewData(data.text_blocks, data.references);
-              });
+              } catch (error) {
+                setError(error instanceof Error ? error.message : 'An unknown error occurred');
+              }
             }}
           >
             Analyze
