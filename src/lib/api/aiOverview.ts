@@ -1,7 +1,7 @@
-import { AIOverview, Difficulty } from '@/types/aiOverview';
+import { AIOverview, Difficulty, SERPResult } from '@/types/aiOverview';
 
-export async function fetchAIOverview(query: string): Promise<AIOverview> {
-  const response = await fetch('/api/ai-overview', {
+export async function fetchAIOverview(query: string): Promise<SERPResult> {
+  const response = await fetch('/api/serp-ai-overview', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -16,24 +16,17 @@ export async function fetchAIOverview(query: string): Promise<AIOverview> {
 
   const data = await response.json();
 
-  return {
-    ...data,
-    references:
-      data.references?.map((ref: any) => ({
-        ...ref,
-        difficulty: calculateDifficulty(ref.link),
-      })) || [],
-  };
+  return data;
 }
 
-function calculateDifficulty(link: string): Difficulty {
+export function calculateDifficulty(link: string): Difficulty {
   const url = link.toLowerCase();
 
   if (url.includes('quora.com') || url.includes('reddit.com')) {
     return 'easy';
   }
 
-  if (url.includes('youtube.com') || url.includes('wikipedia.org')) {
+  if (url.includes('youtube.com') || url.includes('wikipedia.org') || url.includes('medium.com')) {
     return 'medium';
   }
 

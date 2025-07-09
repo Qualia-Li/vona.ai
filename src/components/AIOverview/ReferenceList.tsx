@@ -11,6 +11,7 @@ import { Favicon } from '../common/Favicon';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { calculateDifficulty } from '@/lib/api/aiOverview';
 
 interface ReferenceListProps {
   references: Reference[];
@@ -50,14 +51,14 @@ export default function ReferenceList({ references }: ReferenceListProps) {
                         <TooltipTrigger>
                           <span
                             className={`px-2 py-0.5 rounded text-xs text-white transition-all hover:opacity-80 hover:scale-105 ${getDifficultyColor(
-                              reference.difficulty,
+                              calculateDifficulty(reference.link),
                             )}`}
                           >
-                            {reference.difficulty}
+                            {calculateDifficulty(reference.link)}
                           </span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Optimization difficulty level: {reference.difficulty}</p>
+                          <p>Optimization difficulty level: {calculateDifficulty(reference.link)}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

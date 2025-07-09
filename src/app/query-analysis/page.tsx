@@ -278,7 +278,7 @@ export default function QueryAnalysisPage() {
 
                 console.log('Fetching AI Overview for query:', fullQuery);
                 const data = await fetchAIOverview(fullQuery);
-                setAiOverviewData(data.text_blocks, data.references);
+                setAiOverviewData(data?.ai_overview.text_blocks, data?.ai_overview.references);
               } catch (error) {
                 setError(error instanceof Error ? error.message : 'An unknown error occurred');
               } finally {
