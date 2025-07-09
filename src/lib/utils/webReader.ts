@@ -12,7 +12,7 @@ export interface ParsedWebPage {
  */
 export async function parseWebPage(url: string): Promise<string> {
   try {
-    const response = await fetch('/api/webpage-parser', {
+    const response = await fetch('/api2/webpage-parser', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
