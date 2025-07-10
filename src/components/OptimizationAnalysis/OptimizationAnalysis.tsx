@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Reference } from '@/types/aiOverview';
 
 import ReferenceIcon from './ReferenceIcon';
+import { calculateDifficulty } from '@/lib/api/aiOverview';
 
 interface OptimizationAnalysisProps {
   referenceList: Reference[];
@@ -34,7 +35,7 @@ export default function OptimizationAnalysis({ referenceList }: OptimizationAnal
   }
 
   const averageEasiness = Math.round(
-    referenceList.reduce((acc, ref) => acc + easinessScores[ref.difficulty], 0) / referenceList.length,
+    referenceList.reduce((acc, ref) => acc + easinessScores[calculateDifficulty(ref.link)], 0) / referenceList.length,
   );
 
   return (
@@ -48,9 +49,9 @@ export default function OptimizationAnalysis({ referenceList }: OptimizationAnal
             <div className='text-sm font-medium mb-2'>Reference List</div>
             <div className='flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
               {referenceList
-                .sort((a, b) => easinessScores[b.difficulty] - easinessScores[a.difficulty])
+                .sort((a, b) => easinessScores[calculateDifficulty(b.link)] - easinessScores[calculateDifficulty(a.link)])
                 .map((ref) => (
-                  <ReferenceIcon key={ref.index} reference={ref} difficulty={ref.difficulty} />
+                  <ReferenceIcon key={ref.index} reference={ref} difficulty={calculateDifficulty(ref.link)} />
                 ))}
             </div>
           </div>
