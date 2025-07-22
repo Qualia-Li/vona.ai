@@ -117,14 +117,14 @@ export default function QueryAnalysisPage() {
 
   const faqItems = [
     {
-      question: 'How does the keyword analysis work?',
+      question: 'How does the query analysis work?',
       answer:
-        'Our system analyzes your keywords against AI search patterns, content gaps, and competitor data to provide actionable insights for optimization.',
+        'Our system analyzes your queries against AI search patterns, content gaps, and competitor data to provide actionable insights for optimization.',
     },
     {
-      question: 'What do the suggested keywords mean?',
+      question: 'What do the suggested queries mean?',
       answer:
-        'These are trending or relevant keywords in your niche that have shown potential for AI visibility. Click any keyword to analyze it instantly.',
+        'These are trending or relevant queries in your niche that have shown potential for AI visibility. Click any query to analyze it instantly.',
     },
     {
       question: 'How often is the analysis updated?',
@@ -132,9 +132,9 @@ export default function QueryAnalysisPage() {
         "The analysis is updated in real-time when you click 'Analyze', incorporating the latest AI search patterns and competitor data.",
     },
     {
-      question: 'How do keyword types affect AI Overview visibility?',
+      question: 'How do query types affect AI Overview visibility?',
       answer:
-        'Informational queries typically have a higher chance of triggering AI Overviews compared to commercial or transactional keywords. Focus on educational and explanatory content for better visibility.',
+        'Informational queries typically have a higher chance of triggering AI Overviews compared to commercial or transactional queries. Focus on educational and explanatory content for better visibility.',
     },
     {
       question: 'What role does content quality play in AI Overviews?',
@@ -159,7 +159,7 @@ export default function QueryAnalysisPage() {
     {
       question: 'How long does it take to see optimization results?',
       answer:
-        'The optimization process takes time to show results. Google typically needs 1 month to index new content, followed by approximately 3 months to rank and summarize it. Around this time, you should see an increase in traffic proportional to your keyword volume.',
+        'The optimization process takes time to show results. Google typically needs 1 month to index new content, followed by approximately 3 months to rank and summarize it. Around this time, you should see an increase in traffic proportional to your query volume.',
     },
     {
       question: 'Do different AI search engines prefer different sources?',
@@ -227,7 +227,7 @@ export default function QueryAnalysisPage() {
       <div className='mb-8'>
         <h1 className='text-4xl font-bold'>Query Analysis</h1>
         <p className='text-muted-foreground mt-2'>
-          Detailed analysis of your target keywords and their potential in AI search results.
+          Detailed analysis of your target queries and their potential in AI search results.
         </p>
       </div>
 
@@ -248,7 +248,7 @@ export default function QueryAnalysisPage() {
           </Select>
 
           <Input
-            placeholder='Enter keyword to analyze...'
+            placeholder='Enter query to analyze...'
             className='max-w-xl'
             value={query}
             onChange={(e) => setQuery(e.target.value)}

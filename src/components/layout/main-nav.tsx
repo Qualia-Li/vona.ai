@@ -11,7 +11,7 @@ const items = [
     href: '/website',
   },
   {
-    title: 'Keywords',
+    title: 'Query Overview',
     href: '/keywords',
   },
   {

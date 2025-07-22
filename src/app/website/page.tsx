@@ -117,8 +117,8 @@ export default function WebsiteInputPage() {
       {existingKeywords.length > 0 && (
         <Card className='mt-8'>
           <CardHeader>
-            <CardTitle>Existing Keywords</CardTitle>
-            <CardDescription>Keywords from previous analyses</CardDescription>
+            <CardTitle>Existing Queries</CardTitle>
+            <CardDescription>Queries from previous analyses</CardDescription>
           </CardHeader>
           <CardContent>
             <div className='space-y-4'>

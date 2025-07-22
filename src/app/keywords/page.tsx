@@ -63,8 +63,8 @@ export default function KeywordsPage() {
     <div>
       <div className='flex justify-between items-center mb-8'>
         <div>
-          <h1 className='text-4xl font-bold'>Keyword Suggestions</h1>
-          <p className='text-muted-foreground mt-2'>Customize and manage your target keywords for AI optimization.</p>
+          <h1 className='text-4xl font-bold'>Conversational Query Suggestions</h1>
+          <p className='text-muted-foreground mt-2'>Customize and manage your target conversational queries for AI optimization.</p>
         </div>
         <div className='flex items-center gap-4'>
           <div className='flex items-center border rounded-lg p-1'>
@@ -89,17 +89,17 @@ export default function KeywordsPage() {
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Custom Keyword
+                Add Custom Query
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add Custom Keyword</DialogTitle>
+                <DialogTitle>Add Custom Query</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="flex items-center gap-4">
                   <Input
-                    placeholder="Enter keyword..."
+                    placeholder="Enter query..."
                     value={newKeyword}
                     onChange={(e) => setNewKeyword(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddKeyword()}
@@ -117,7 +117,7 @@ export default function KeywordsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Keyword</TableHead>
+                <TableHead>Query</TableHead>
                 <TableHead>
                   <Button variant='ghost' onClick={() => handleSort('volume')} className='flex items-center gap-1'>
                     Volume
