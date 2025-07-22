@@ -96,7 +96,6 @@ export default function KeywordsPage() {
     if (keywords.length === 0) {
       setAnalysisStatus('error');
       setAnalysisMessage('No keywords to analyze. Add some keywords first.');
-      setTimeout(() => setAnalysisStatus('idle'), 3000);
       return;
     }
 
@@ -388,107 +387,84 @@ export default function KeywordsPage() {
       // Reset status
       setAnalysisStatus('success');
       setAnalysisMessage('PDF exported successfully');
-      setTimeout(() => setAnalysisStatus('idle'), 3000);
     } catch (error) {
       console.error('Failed to export PDF:', error);
       setAnalysisStatus('error');
       setAnalysisMessage('Failed to export PDF. Please try again.');
-      setTimeout(() => setAnalysisStatus('idle'), 3000);
     }
   };
 
   return (
     <div>
-      <div className='flex justify-between items-center mb-8'>
+      <div className='space-y-4 mb-8'>
         <div>
           <h1 className='text-4xl font-bold'>Conversational Query Suggestions</h1>
-          <p className='text-muted-foreground mt-2'>Customize and manage your target conversational queries for AI optimization.</p>
+          <p className='text-muted-foreground mt-2'>
+            Customize and manage your target conversational queries for AI optimization.
+          </p>
         </div>
-        <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-2'>
-            {analysisStatus !== 'idle' && (
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${
-                analysisStatus === 'analyzing' ? 'bg-blue-50 text-blue-700' :
-                analysisStatus === 'success' ? 'bg-green-50 text-green-700' :
-                'bg-red-50 text-red-700'
-              }`}>
-                {analysisStatus === 'analyzing' ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                ) : analysisStatus === 'success' ? (
-                  <CheckCircle2 className="h-4 w-4" />
-                ) : (
-                  <XCircle className="h-4 w-4" />
-                )}
-                <span className="text-sm font-medium">{analysisMessage}</span>
-              </div>
-            )}
-            <Button 
-              variant="outline"
-              onClick={handleExport}
-              disabled={keywords.length === 0}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export PDF
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={handleAnalyzeAll}
-              disabled={analysisStatus === 'analyzing' || keywords.length === 0}
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${analysisStatus === 'analyzing' ? 'animate-spin' : ''}`} />
-              {analysisStatus === 'analyzing' ? 'Analyzing...' : 'Analyze All'}
-            </Button>
-            <Dialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant="outline"
-                  disabled={keywords.length === 0}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Clear All
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Clear All Keywords</DialogTitle>
-                </DialogHeader>
-                <div className="py-4">
-                  <p>Are you sure you want to clear all keywords? This action cannot be undone.</p>
-                  <p className="text-muted-foreground mt-2">This will remove {keywords.length} keywords.</p>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsClearDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button variant="destructive" onClick={handleClearAll}>
-                    Clear All
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className='flex items-center border rounded-lg p-1'>
+
+        {/* Action Buttons */}
+        <div className='flex items-center gap-4 justify-end'>
+          <Button onClick={handleAnalyzeAll} disabled={analysisStatus === 'analyzing' || keywords.length === 0}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${analysisStatus === 'analyzing' ? 'animate-spin' : ''}`} />
+            {analysisStatus === 'analyzing' ? 'Analyzing...' : 'Analyze All'}
+          </Button>
+
+          {/* change view mode */}
+          <div className='flex items-center border rounded-md p-1 h-9 shadow-sm'>
             <Toggle
               pressed={viewMode === 'table'}
               onPressedChange={() => setViewMode('table')}
               size='sm'
-              className='data-[state=on]:bg-muted'
+              className='data-[state=on]:bg-muted flex items-center gap-2 px-3'
             >
               <TableIcon className='h-4 w-4' />
+              <span className='text-sm'>List</span>
             </Toggle>
             <Toggle
               pressed={viewMode === 'card'}
               onPressedChange={() => setViewMode('card')}
               size='sm'
-              className='data-[state=on]:bg-muted'
+              className='data-[state=on]:bg-muted flex items-center gap-2 px-3'
             >
               <LayoutGrid className='h-4 w-4' />
+              <span className='text-sm'>Grid</span>
             </Toggle>
           </div>
+
+          {/* clear all keywords */}
+          <Dialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant='outline' disabled={keywords.length === 0}>
+                <Trash2 className='h-4 w-4 mr-2' />
+                Clear All
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Clear All Keywords</DialogTitle>
+              </DialogHeader>
+              <div className='py-4'>
+                <p>Are you sure you want to clear all keywords? This action cannot be undone.</p>
+                <p className='text-muted-foreground mt-2'>This will remove {keywords.length} keywords.</p>
+              </div>
+              <DialogFooter>
+                <Button variant='outline' onClick={() => setIsClearDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button variant='destructive' onClick={handleClearAll}>
+                  Clear All
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* add custom query dialog */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
+              <Button variant='outline'>
+                <Plus className='h-4 w-4 mr-2' />
                 Add Custom Query
               </Button>
             </DialogTrigger>
@@ -496,60 +472,84 @@ export default function KeywordsPage() {
               <DialogHeader>
                 <DialogTitle>Add Custom Query</DialogTitle>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="flex items-center gap-4">
+              <div className='grid gap-4 py-4'>
+                <div className='flex items-center gap-4'>
                   <Input
-                    placeholder="Enter query..."
+                    placeholder='Enter query...'
                     value={newKeyword}
                     onChange={(e) => setNewKeyword(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddKeyword()}
                   />
-                  <Button onClick={handleAddKeyword} disabled={!newKeyword.trim()}>Add</Button>
+                  <Button onClick={handleAddKeyword} disabled={!newKeyword.trim()}>
+                    Add
+                  </Button>
                 </div>
               </div>
             </DialogContent>
           </Dialog>
+
+          {/* export pdf */}
+          <Button variant='outline' onClick={handleExport} disabled={keywords.length === 0}>
+            <Download className='h-4 w-4 mr-2' />
+            Export PDF
+          </Button>
         </div>
+
+        {/* Status Message */}
+        {analysisStatus !== 'idle' && (
+          <div
+            className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${
+              analysisStatus === 'analyzing'
+                ? 'bg-blue-50 text-blue-700'
+                : analysisStatus === 'success'
+                  ? 'bg-green-50 text-green-700'
+                  : 'bg-red-50 text-red-700'
+            }`}
+          >
+            {analysisStatus === 'analyzing' ? (
+              <RefreshCw className='h-5 w-5 animate-spin' />
+            ) : analysisStatus === 'success' ? (
+              <CheckCircle2 className='h-5 w-5' />
+            ) : (
+              <XCircle className='h-5 w-5' />
+            )}
+          </div>
+        )}
       </div>
 
-      <div ref={contentRef} className="space-y-8 bg-white print:p-8 rounded-lg">
+      <div ref={contentRef} className='space-y-8 bg-white print:p-8 rounded-lg'>
         {/* AI Visibility Score card */}
-        <div className="p-6 border rounded-lg bg-white">
-          <div className="flex items-center justify-between">
+        <div className='p-6 border rounded-lg bg-white'>
+          <div className='flex items-center justify-between'>
             <div>
-              <h2 className="text-2xl font-semibold mb-2">AI Visibility Score</h2>
-              <p className="text-muted-foreground">
+              <h2 className='text-2xl font-semibold mb-2'>AI Visibility Score</h2>
+              <p className='text-muted-foreground'>
                 Combined score based on volume, AI likelihood, optimization ease, and purchase intent
               </p>
             </div>
-            <div className="text-right">
-              <div className="text-4xl font-bold text-primary mb-1">
+            <div className='text-right'>
+              <div className='text-4xl font-bold text-primary mb-1'>
                 {aiVisibilityScore !== null ? (
                   <>
                     {aiVisibilityScore}
-                    <span className="text-lg text-muted-foreground">/100</span>
+                    <span className='text-lg text-muted-foreground'>/100</span>
                   </>
                 ) : (
                   '—'
                 )}
               </div>
-              <div className="text-sm text-muted-foreground">
-                {keywords.length === 0 ? (
-                  'Add keywords to see score'
-                ) : aiVisibilityScore === null ? (
-                  'Analyze keywords to see score'
-                ) : (
-                  `Based on ${keywords.filter(k => k.analysisStatus === 'success').length} analyzed keywords`
-                )}
+              <div className='text-sm text-muted-foreground'>
+                {keywords.length === 0
+                  ? 'Add keywords to see score'
+                  : aiVisibilityScore === null
+                    ? 'Analyze keywords to see score'
+                    : `Based on ${keywords.filter((k) => k.analysisStatus === 'success').length} analyzed keywords`}
               </div>
             </div>
           </div>
           {aiVisibilityScore !== null && (
-            <div className="mt-4">
-              <Progress 
-                value={aiVisibilityScore} 
-                className="h-2"
-              />
+            <div className='mt-4'>
+              <Progress value={aiVisibilityScore} className='h-2' />
             </div>
           )}
         </div>
@@ -563,9 +563,9 @@ export default function KeywordsPage() {
                   <TableHead>Status</TableHead>
                   <TableHead>Query</TableHead>
                   <TableHead>
-                    <Button 
-                      variant='ghost' 
-                      onClick={() => handleSort('volume')} 
+                    <Button
+                      variant='ghost'
+                      onClick={() => handleSort('volume')}
                       className={`flex items-center gap-1 ${sortField === 'volume' ? 'text-primary' : ''}`}
                     >
                       Volume
@@ -606,11 +606,11 @@ export default function KeywordsPage() {
                 {sortedKeywords.map((keyword) => (
                   <TableRow key={keyword.id}>
                     <TableCell>
-                      <div className="flex items-center gap-2">
+                      <div className='flex items-center gap-2'>
                         {getStatusIcon(keyword)}
-                        {keyword.analysisMessage && (
+                        {/* {keyword.analysisMessage && (
                           <span className="text-xs text-muted-foreground">{keyword.analysisMessage}</span>
-                        )}
+                        )} */}
                       </div>
                     </TableCell>
                     <TableCell className='font-medium'>
@@ -631,7 +631,9 @@ export default function KeywordsPage() {
                             <Progress value={keyword.aiOverviewLikelihood} className='h-2' />
                             <span className='text-sm text-muted-foreground'>{keyword.aiOverviewLikelihood}%</span>
                           </>
-                        ) : '—'}
+                        ) : (
+                          '—'
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -641,7 +643,9 @@ export default function KeywordsPage() {
                             <Progress value={keyword.optimizationDifficulty} className='h-2' />
                             <span className='text-sm text-muted-foreground'>{keyword.optimizationDifficulty}%</span>
                           </>
-                        ) : '—'}
+                        ) : (
+                          '—'
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -669,9 +673,9 @@ export default function KeywordsPage() {
         ) : (
           <div className='grid gap-4'>
             {sortedKeywords.map((keyword) => (
-              <Card key={keyword.id} className="bg-white">
+              <Card key={keyword.id} className='bg-white'>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <div className="flex items-center gap-4">
+                  <div className='flex items-center gap-4'>
                     {getStatusIcon(keyword)}
                     <div>
                       <CardTitle className='text-lg font-medium'>{keyword.term}</CardTitle>
@@ -698,7 +702,9 @@ export default function KeywordsPage() {
                             <Progress value={keyword.aiOverviewLikelihood} className='h-2' />
                             <div className='text-sm text-muted-foreground mt-1'>{keyword.aiOverviewLikelihood}%</div>
                           </>
-                        ) : '—'}
+                        ) : (
+                          '—'
+                        )}
                       </div>
                       <div>
                         <div className='text-sm font-medium mb-2'>Optimization Difficulty</div>
@@ -707,7 +713,9 @@ export default function KeywordsPage() {
                             <Progress value={keyword.optimizationDifficulty} className='h-2' />
                             <div className='text-sm text-muted-foreground mt-1'>{keyword.optimizationDifficulty}%</div>
                           </>
-                        ) : '—'}
+                        ) : (
+                          '—'
+                        )}
                       </div>
                       <div>
                         <div className='text-sm font-medium mb-2'>Purchase Intent</div>
