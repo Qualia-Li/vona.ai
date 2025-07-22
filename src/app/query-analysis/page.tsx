@@ -308,7 +308,8 @@ export default function QueryAnalysisPage() {
           <p className='text-sm text-muted-foreground'>Show results for:</p>
           <TabsList>
             <TabsTrigger value='ai-overview'>Google AI Overview</TabsTrigger>
-            <TabsTrigger value='organic-results'>Google Organic Results</TabsTrigger>
+            <TabsTrigger value='serp-analysis'>SERP Analysis</TabsTrigger>
+            <TabsTrigger value='organic-results'>Organic Results</TabsTrigger>
           </TabsList>
 
           <TabsContent value='ai-overview' className='space-y-4'>
@@ -323,6 +324,82 @@ export default function QueryAnalysisPage() {
             <OptimizationAnalysis referenceList={aiOverviewData?.references || []} />
 
             <CompetitorAnalysis references={aiOverviewData?.references || []} />
+          </TabsContent>
+
+          <TabsContent value='serp-analysis' className='space-y-4'>
+            <Card>
+              <CardHeader>
+                <CardTitle>SERP Analysis</CardTitle>
+                <p className='text-sm text-muted-foreground'>Detailed analysis of search engine results page</p>
+              </CardHeader>
+              <CardContent>
+                <div className='space-y-6'>
+                  {/* SERP Features */}
+                  <div>
+                    <h3 className='text-lg font-semibold mb-4'>SERP Features</h3>
+                    <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
+                      {organicResults.length > 0 ? (
+                        <>
+                          <div className='p-4 border rounded-lg'>
+                            <div className='text-2xl font-bold'>{organicResults.length}</div>
+                            <div className='text-sm text-muted-foreground'>Organic Results</div>
+                          </div>
+                          <div className='p-4 border rounded-lg'>
+                            <div className='text-2xl font-bold'>
+                              {organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions).length}
+                            </div>
+                            <div className='text-sm text-muted-foreground'>Rich Snippets</div>
+                          </div>
+                          <div className='p-4 border rounded-lg'>
+                            <div className='text-2xl font-bold'>
+                              {organicResults.filter(r => (r.sitelinks?.list?.length || 0) > 0).length}
+                            </div>
+                            <div className='text-sm text-muted-foreground'>Sitelinks</div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className='col-span-3 text-center text-muted-foreground py-8'>
+                          Run a query to see SERP features analysis
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Content Types */}
+                  <div>
+                    <h3 className='text-lg font-semibold mb-4'>Content Types</h3>
+                    <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
+                      {organicResults.length > 0 ? (
+                        <>
+                          <div className='p-4 border rounded-lg'>
+                            <div className='text-2xl font-bold'>
+                              {organicResults.filter(r => r.thumbnail).length}
+                            </div>
+                            <div className='text-sm text-muted-foreground'>Visual Content</div>
+                          </div>
+                          <div className='p-4 border rounded-lg'>
+                            <div className='text-2xl font-bold'>
+                              {organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions?.rating).length}
+                            </div>
+                            <div className='text-sm text-muted-foreground'>Reviews</div>
+                          </div>
+                          <div className='p-4 border rounded-lg'>
+                            <div className='text-2xl font-bold'>
+                              {organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions?.price).length}
+                            </div>
+                            <div className='text-sm text-muted-foreground'>Products</div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className='col-span-3 text-center text-muted-foreground py-8'>
+                          Run a query to see content type analysis
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value='organic-results' className='space-y-4'>
