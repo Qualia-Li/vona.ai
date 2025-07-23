@@ -51,7 +51,7 @@ export default function QueryAnalysisPage() {
   const [userLocation, setUserLocation] = useState<LocationData | null>(null);
   const [defaultTab, setDefaultTab] = useState(aiOverviewData?.text_blocks ? 'ai-overview' : 'organic-results');
   const contentRef = useRef<HTMLDivElement>(null);
-
+  const [exportError, setExportError] = useState<string | null>(null);
   // Handle URL query parameter on mount and changes
   useEffect(() => {
     const urlQuery = searchParams.get('query');
@@ -293,41 +293,234 @@ export default function QueryAnalysisPage() {
   };
 
   const handleExport = async () => {
-    if (!contentRef.current) return;
+    if (!query || !aiOverviewData?.text_blocks) {
+      alert('No analysis results to export. Please analyze a query first.');
+      return;
+    }
 
     try {
-      // Dynamically import the libraries only when needed
-      const html2canvas = (await import('html2canvas')).default;
-      const jsPDF = (await import('jspdf')).default;
-
-      // Show loading state
       setIsLoading(true);
-      setError('Generating PDF...');
+      setExportError(null);
 
-      // Create canvas from the content
-      const canvas = await html2canvas(contentRef.current, {
-        scale: 2,
-        logging: false,
-        backgroundColor: '#ffffff',
-      });
+      const jsPDF = (await import('jspdf')).default;
+      const pdf = new jsPDF();
 
-      // Calculate dimensions to fit on A4
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Create PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
+      let yPosition = 20;
+      const margin = 20;
+      const pageWidth = 210; // A4 width
+      const contentWidth = pageWidth - (margin * 2);
 
-      // Download the PDF
+      const addHeading = (text: string, size = 24) => {
+        if (yPosition > 270) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+        pdf.setFontSize(size);
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(text, margin, yPosition);
+        yPosition += size / 2 + 3; // Reduced spacing
+      };
+
+      const addText = (text: string | undefined, size = 12) => {
+        if (!text) return; // Skip undefined text
+        pdf.setFontSize(size);
+        const lines = pdf.splitTextToSize(text, contentWidth);
+        if (yPosition + (lines.length * 5) > 280) { // Reduced line height
+          pdf.addPage();
+          yPosition = 20;
+        }
+        pdf.text(lines, margin, yPosition);
+        yPosition += lines.length * 5 + 3; // Reduced spacing
+      };
+
+      const addProgressBar = (label: string, value: number) => {
+        if (yPosition > 270) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+        pdf.setFontSize(10);
+        pdf.text(`${label}: ${value}%`, margin, yPosition);
+        
+        // Draw progress bar background
+        pdf.setDrawColor(200, 200, 200);
+        pdf.setFillColor(200, 200, 200);
+        pdf.rect(margin, yPosition + 2, 100, 3, 'F');
+        
+        // Draw progress bar value
+        pdf.setDrawColor(102, 89, 223);
+        pdf.setFillColor(102, 89, 223);
+        pdf.rect(margin, yPosition + 2, value, 3, 'F');
+        
+        yPosition += 8; // Reduced spacing
+      };
+
+      // Title and Query
+      addHeading('Query Analysis Report');
+      pdf.setTextColor(102, 89, 223);
+      addText(`Query: ${query}`, 16);
+      yPosition += 5;
+
+      // AI Overview Section
+      if (aiOverviewData.text_blocks?.length) {
+        addHeading('AI Overview', 20);
+        
+        aiOverviewData.text_blocks.forEach(block => {
+          if (block.type === 'paragraph' && block.snippet) {
+            addText(block.snippet);
+          } else if (block.type === 'list' && block.list) {
+            block.list.forEach((item, i) => {
+              if (item.title) {
+                addText(`• ${item.title}`);
+                if (item.snippet) {
+                  pdf.setTextColor(100, 100, 100);
+                  addText(item.snippet, 10);
+                  pdf.setTextColor(0, 0, 0);
+                }
+              }
+            });
+          }
+        });
+      }
+
+      // Optimization Analysis Section
+      if (aiOverviewData.references?.length) {
+        yPosition += 3;
+        addHeading('Optimization Analysis', 20);
+
+        // Overall Optimization
+        addText('Overall Optimization Recommendations', 14);
+        const recommendations = [
+          'Content Quality: Ensure comprehensive coverage of the topic',
+          'Source Authority: Include references from trusted domains',
+          'Content Structure: Use clear headings and organized sections',
+          'Rich Media: Include relevant images, videos, or diagrams',
+          'User Experience: Optimize page load speed and mobile responsiveness'
+        ];
+        recommendations.forEach(rec => addText(`• ${rec}`, 11));
+        yPosition += 3;
+
+        // Reference Analysis
+        addText('Reference Analysis', 14);
+        const domains = new Set(aiOverviewData.references.map(ref => new URL(ref.link).hostname));
+        addText(`Number of unique source domains: ${domains.size}`, 11);
+        addText(`Total references: ${aiOverviewData.references.length}`, 11);
+        yPosition += 3;
+
+        // Competitor Analysis
+        addText('Competitor Analysis', 14);
+        const competitors = aiOverviewData.references.reduce((acc, ref) => {
+          const domain = new URL(ref.link).hostname;
+          acc[domain] = (acc[domain] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+
+        Object.entries(competitors)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 5)
+          .forEach(([domain, count]) => {
+            addText(`• ${domain}: ${count} references`, 11);
+          });
+      }
+
+      // References Section
+      if (aiOverviewData.references?.length) {
+        yPosition += 3;
+        addHeading('References', 20);
+        
+        aiOverviewData.references.forEach((ref, index) => {
+          if (ref.title) {
+            const refText = `${index + 1}. ${ref.title}`;
+            addText(refText, 11);
+            pdf.setTextColor(100, 100, 100);
+            if (ref.snippet) addText(ref.snippet, 10);
+            addText(`Source: ${ref.source}`, 9);
+            pdf.setTextColor(0, 0, 0);
+            yPosition += 2;
+          }
+        });
+      }
+
+      // SERP Analysis Section
+      if (organicResults.length) {
+        yPosition += 3;
+        addHeading('SERP Analysis', 20);
+
+        // SERP Features
+        addText('SERP Features', 14);
+        const features = {
+          'Organic Results': organicResults.length,
+          'Rich Snippets': organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions).length,
+          'Sitelinks': organicResults.filter(r => (r.sitelinks?.list?.length || 0) > 0).length
+        };
+
+        Object.entries(features).forEach(([label, value]) => {
+          addText(`${label}: ${value}`, 11);
+        });
+
+        // Content Types
+        yPosition += 3;
+        addText('Content Types', 14);
+        const contentTypes = {
+          'Visual Content': organicResults.filter(r => r.thumbnail).length,
+          'Reviews': organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions?.rating).length,
+          'Products': organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions?.price).length
+        };
+
+        Object.entries(contentTypes).forEach(([label, value]) => {
+          addText(`${label}: ${value}`, 11);
+        });
+      }
+
+      // Organic Results Section
+      if (organicResults.length) {
+        yPosition += 5;
+        addHeading('Organic Results', 20);
+        
+        organicResults.forEach((result, index) => {
+          if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+
+          pdf.setTextColor(102, 89, 223);
+          addText(`${index + 1}. ${result.title}`, 12);
+          if (result.displayed_link) {
+            pdf.setTextColor(100, 100, 100);
+            addText(result.displayed_link, 10);
+          }
+          pdf.setTextColor(0, 0, 0);
+          if (result.snippet) {
+            addText(result.snippet, 11);
+          }
+
+          // Add rich snippet info if available
+          if (result.rich_snippet?.bottom?.detected_extensions) {
+            const ext = result.rich_snippet.bottom.detected_extensions;
+            if (ext.rating) addText(`Rating: ${ext.rating}/5 (${ext.reviews} reviews)`, 10);
+            if (ext.price) addText(`Price: ${ext.currency}${ext.price}`, 10);
+          }
+
+          // Add sitelinks if available
+          if (result.sitelinks?.list?.length) {
+            addText('Sitelinks:', 10);
+            result.sitelinks.list.forEach(link => {
+              if (link.title) {
+                pdf.setTextColor(102, 89, 223);
+                addText(`- ${link.title}`, 9);
+              }
+            });
+            pdf.setTextColor(0, 0, 0);
+          }
+
+          yPosition += 3;
+        });
+      }
+
       pdf.save(`query-analysis-${query}-${new Date().toISOString().split('T')[0]}.pdf`);
-
-      // Reset status
-      setIsLoading(false);
-      setError(null);
     } catch (error) {
       console.error('Failed to export PDF:', error);
-      setError('Failed to export PDF. Please try again.');
+      setExportError(error instanceof Error ? error.message : 'Failed to export PDF. Please try again.');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -342,12 +535,20 @@ export default function QueryAnalysisPage() {
               Detailed analysis of your target queries and their potential in AI search results.
             </p>
           </div>
-          <Button variant='outline' onClick={handleExport} disabled={isLoading || !query}>
-            <Download className='h-4 w-4 mr-2' />
-            Export PDF
-          </Button>
+          {query && aiOverviewData?.text_blocks && (
+            <Button variant='outline' onClick={handleExport} disabled={isLoading}>
+              <Download className='h-4 w-4 mr-2' />
+              {isLoading ? 'Exporting...' : 'Export PDF'}
+            </Button>
+          )}
         </div>
       </div>
+
+      {exportError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{exportError}</AlertDescription>
+        </Alert>
+      )}
 
       <div ref={contentRef} className='space-y-6'>
         {/* Search Input Section */}
