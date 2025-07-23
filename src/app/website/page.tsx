@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useKeywordsStore } from '@/lib/store/keywordsStore';
+import { AnalysisLinks } from '@/components/ui/analysis-links';
 
 interface KeywordResponse {
   url: string;
@@ -91,27 +92,33 @@ export default function WebsiteInputPage() {
       </Card>
 
       {keywordResults && (
-        <Card className='mt-8'>
-          <CardHeader>
-            <CardTitle>Generated Keywords</CardTitle>
-            <CardDescription>
-              {keywordResults.success ? `Keywords generated for ${keywordResults.url}` : keywordResults.message}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {keywordResults.keywords.length > 0 ? (
-              <div className='grid gap-2'>
-                {keywordResults.keywords.map((keyword, index) => (
-                  <div key={index} className='p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors'>
-                    <div className='font-medium'>{keyword}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className='text-muted-foreground'>No keywords generated.</p>
-            )}
-          </CardContent>
-        </Card>
+        <>
+          <Card className='mt-8'>
+            <CardHeader>
+              <CardTitle>Generated Keywords</CardTitle>
+              <CardDescription>
+                {keywordResults.success ? `Keywords generated for ${keywordResults.url}` : keywordResults.message}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {keywordResults.keywords.length > 0 ? (
+                <div className='grid gap-2'>
+                  {keywordResults.keywords.map((keyword, index) => (
+                    <div key={index} className='p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors'>
+                      <div className='font-medium'>{keyword}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className='text-muted-foreground'>No keywords generated.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="mt-8">
+            <AnalysisLinks url={url} />
+          </div>
+        </>
       )}
 
       {existingKeywords.length > 0 && (
