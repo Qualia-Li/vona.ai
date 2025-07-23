@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { AlertCircle, Download, RefreshCw } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -17,11 +17,10 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useKeywordsStore } from '@/lib/store/keywordsStore';
-import { useAIOverview } from '@/lib/store/useAIOverview';
+import { useSearchResults } from '@/lib/store/searchResultsStore';
 import { OrganicResult } from '@/types/aiOverview';
 
 import { fetchAIOverview } from '@/lib/api/aiOverview';
-import { RefreshCw } from 'lucide-react';
 
 interface LocationData {
   city: string;
@@ -32,25 +31,41 @@ interface LocationData {
 export default function QueryAnalysisPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { aiOverviewData, setAiOverviewData, isLoading } = useAIOverview();
+  const { 
+    currentQuery,
+    setCurrentQuery,
+    aiOverviewData, 
+    organicResults, 
+    isLoading, 
+    setAiOverviewData, 
+    setOrganicResults, 
+    setIsLoading,
+    clearResults 
+  } = useSearchResults();
+  const [query, setQuery] = useState(currentQuery);
   const { keywords } = useKeywordsStore();
-  const [query, setQuery] = useState(searchParams.get('query') || '');
   const [questionWord, setQuestionWord] = useState('what is the best');
   const [error, setError] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [timeFilter, setTimeFilter] = useState('none');
   const [locationFilter, setLocationFilter] = useState('none');
   const [userLocation, setUserLocation] = useState<LocationData | null>(null);
-  const [organicResults, setOrganicResults] = useState<OrganicResult[]>([]);
   const [defaultTab, setDefaultTab] = useState(aiOverviewData?.text_blocks ? 'ai-overview' : 'organic-results');
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  // Trigger initial analysis if query exists in URL
+  // Handle URL query parameter on mount and changes
   useEffect(() => {
     const urlQuery = searchParams.get('query');
+    
     if (urlQuery) {
-      handleAnalysis();
+      // If URL has query, use it and trigger search
+      setQuery(urlQuery);
+      handleAnalysis(urlQuery);
+    } else if (!currentQuery) {
+      // If no URL query and no current query, clear results
+      clearResults();
     }
-  }, []); // Run only once on mount
+    // If there's a current query but no URL query, keep showing stored results
+  }, [searchParams]);
 
   useEffect(() => {
     if (aiOverviewData?.text_blocks && !isLoading) {
@@ -59,15 +74,6 @@ export default function QueryAnalysisPage() {
       setDefaultTab('organic-results');
     }
   }, [aiOverviewData?.text_blocks, isLoading]);
-
-  // Update query when URL parameter changes
-  useEffect(() => {
-    const urlQuery = searchParams.get('query');
-    if (urlQuery && urlQuery !== query) {
-      setQuery(urlQuery);
-      handleAnalysis();
-    }
-  }, [searchParams]);
 
   // Get user's location
   useEffect(() => {
@@ -159,13 +165,11 @@ export default function QueryAnalysisPage() {
 
   const handleKeywordClick = (term: string) => {
     setQuery(term);
-    // Update URL when clicking a keyword
     router.push(`/query-analysis?query=${encodeURIComponent(term)}`);
   };
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuery = e.target.value;
-    setQuery(newQuery);
+    setQuery(e.target.value);
   };
 
   const faqItems = [
@@ -226,18 +230,19 @@ export default function QueryAnalysisPage() {
     },
   ];
 
-  const handleAnalysis = async () => {
+  const handleAnalysis = async (queryToAnalyze = query) => {
     try {
-      // Update URL when analyzing
-      if (query) {
-        router.push(`/query-analysis?query=${encodeURIComponent(query)}`);
+      if (queryToAnalyze) {
+        router.push(`/query-analysis?query=${encodeURIComponent(queryToAnalyze)}`);
+        setCurrentQuery(queryToAnalyze);
+      } else {
+        clearResults();
+        return;
       }
       
-      setIsAnalyzing(true);
+      setIsLoading(true);
       setError(null);
-      setAiOverviewData([], []);
-      setOrganicResults([]);
-      let fullQuery = `${questionWord} ${query}`.trim();
+      let fullQuery = `${questionWord} ${queryToAnalyze}`.trim();
 
       // Add time filter to query if selected
       if (timeFilter !== 'none') {
@@ -276,23 +281,72 @@ export default function QueryAnalysisPage() {
         setDefaultTab('ai-overview');
       }
       setOrganicResults(data?.organic_results || []);
+      setCurrentQuery(fullQuery);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An unknown error occurred');
     } finally {
-      setIsAnalyzing(false);
+      setIsLoading(false);
+    }
+  };
+
+  const handleExport = async () => {
+    if (!contentRef.current) return;
+
+    try {
+      // Dynamically import the libraries only when needed
+      const html2canvas = (await import('html2canvas')).default;
+      const jsPDF = (await import('jspdf')).default;
+
+      // Show loading state
+      setIsLoading(true);
+      setError('Generating PDF...');
+
+      // Create canvas from the content
+      const canvas = await html2canvas(contentRef.current, {
+        scale: 2,
+        logging: false,
+        backgroundColor: '#ffffff',
+      });
+
+      // Calculate dimensions to fit on A4
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
+
+      // Download the PDF
+      pdf.save(`query-analysis-${query}-${new Date().toISOString().split('T')[0]}.pdf`);
+
+      // Reset status
+      setIsLoading(false);
+      setError(null);
+    } catch (error) {
+      console.error('Failed to export PDF:', error);
+      setError('Failed to export PDF. Please try again.');
+      setIsLoading(false);
     }
   };
 
   return (
     <div>
       <div className='mb-8'>
-        <h1 className='text-4xl font-bold'>Query Analysis</h1>
-        <p className='text-muted-foreground mt-2'>
-          Detailed analysis of your target queries and their potential in AI search results.
-        </p>
+        <div className='flex justify-between items-center'>
+          <div>
+            <h1 className='text-4xl font-bold'>Query Analysis</h1>
+            <p className='text-muted-foreground mt-2'>
+              Detailed analysis of your target queries and their potential in AI search results.
+            </p>
+          </div>
+          <Button variant='outline' onClick={handleExport} disabled={isLoading || !query}>
+            <Download className='h-4 w-4 mr-2' />
+            Export PDF
+          </Button>
+        </div>
       </div>
 
-      <div className='space-y-6'>
+      <div ref={contentRef} className='space-y-6'>
         {/* Search Input Section */}
         <div className='flex gap-2'>
           <Select value={questionWord} onValueChange={setQuestionWord}>
@@ -300,6 +354,7 @@ export default function QueryAnalysisPage() {
               <SelectValue placeholder='Select prefix' />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value=' '>(None)</SelectItem>
               <SelectItem value='what is the best'>What is/are the best</SelectItem>
               <SelectItem value='what is'>What is/are</SelectItem>
               <SelectItem value='review of the best'>Review of the best</SelectItem>
@@ -314,7 +369,7 @@ export default function QueryAnalysisPage() {
             value={query}
             onChange={handleQueryChange}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !isAnalyzing) {
+              if (e.key === 'Enter' && !isLoading) {
                 handleAnalysis();
               }
             }}
@@ -348,8 +403,10 @@ export default function QueryAnalysisPage() {
             </SelectContent>
           </Select>
 
-          <Button onClick={handleAnalysis} disabled={isAnalyzing}>
-            {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+          <Button 
+            onClick={() => handleAnalysis()} 
+            disabled={isLoading}>
+            {isLoading ? 'Analyzing...' : 'Analyze'}
           </Button>
         </div>
 
@@ -371,7 +428,9 @@ export default function QueryAnalysisPage() {
         </div>
 
         <Tabs defaultValue={defaultTab} className='space-y-2'>
-          <p className='text-sm text-muted-foreground'>Show results for:</p>
+          <p className='text-sm text-muted-foreground'>
+            {currentQuery ? `Results for: ${currentQuery}` : 'Enter a query to analyze'}
+          </p>
           <TabsList>
             <TabsTrigger value='organic-results'>Organic Results</TabsTrigger>
             <TabsTrigger value='ai-overview'>Google AI Overview</TabsTrigger>
