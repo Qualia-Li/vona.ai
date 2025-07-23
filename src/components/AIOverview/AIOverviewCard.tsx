@@ -12,44 +12,7 @@ interface AIOverviewProps {
 }
 
 export default function AIOverviewCard({ data }: AIOverviewProps) {
-  if (!data) {
-    console.log('ai overview: no data');
-    return (
-      <div className='flex gap-6'>
-        <Card className='flex-1 p-6 bg-[#202124] text-white'>
-          <div className='flex items-center justify-between mb-6'>
-            <div className='flex items-center gap-2'>
-              <div className='w-4 h-4 bg-blue-400/20 rounded-full animate-pulse' />
-              <div className='h-7 w-32 bg-gray-700/50 rounded animate-pulse' />
-            </div>
-          </div>
-
-          <div className='space-y-6'>
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className='space-y-2'>
-                <div className='h-4 bg-gray-700/50 rounded w-3/4 animate-pulse' />
-                <div className='h-4 bg-gray-700/50 rounded w-full animate-pulse' />
-                <div className='h-4 bg-gray-700/50 rounded w-2/3 animate-pulse' />
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <div className='w-[400px]'>
-          <Card className='p-6 bg-[#202124] text-white h-full'>
-            <div className='space-y-4'>
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className='h-16 bg-gray-700/50 rounded animate-pulse' />
-              ))}
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data.text_blocks) {
-    console.log('ai overview: no text blocks');
+  if (!data?.text_blocks || data.text_blocks.length === 0) {
     return (
       <div className='flex gap-6'>
         <Card className='flex-1 p-6 bg-[#202124] text-white'>

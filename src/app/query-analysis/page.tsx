@@ -279,6 +279,9 @@ export default function QueryAnalysisPage() {
       if (data?.ai_overview?.text_blocks) {
         setAiOverviewData(data?.ai_overview?.text_blocks, data?.ai_overview?.references);
         setDefaultTab('ai-overview');
+      } else {
+        setAiOverviewData([], []);
+        setDefaultTab('organic-results');
       }
       setOrganicResults(data?.organic_results || []);
       setCurrentQuery(fullQuery);
