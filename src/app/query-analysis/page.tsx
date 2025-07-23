@@ -297,9 +297,54 @@ export default function QueryAnalysisPage() {
     }
   };
 
+  const addLogoToPdf = async (pdf: any) => {
+    try {
+      // Create an Image element to load the logo
+      const img = new Image();
+      img.src = '/images/enception_logo.png';
+      
+      // Wait for the image to load
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      // Calculate dimensions to maintain aspect ratio (smaller size)
+      const imgWidth = 15; // mm - much smaller
+      const imgHeight = (img.height * imgWidth) / img.width;
+
+      // Add logo to all pages
+      const pageCount = pdf.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        pdf.setPage(i);
+        // Add logo at the bottom right of each page
+        pdf.addImage(
+          img, 
+          'PNG', 
+          pdf.internal.pageSize.width - imgWidth - 5, // 5mm from right
+          pdf.internal.pageSize.height - imgHeight - 5, // 5mm from bottom
+          imgWidth, 
+          imgHeight
+        );
+        
+        // Add "Generated with Enception.AI" text
+        pdf.setFontSize(6); // Smaller text
+        pdf.setTextColor(128, 128, 128);
+        pdf.text(
+          'Generated with Enception.AI', 
+          pdf.internal.pageSize.width - 5, 
+          pdf.internal.pageSize.height - 3, 
+          { align: 'right' }
+        );
+      }
+    } catch (error) {
+      console.error('Failed to add logo:', error);
+    }
+  };
+
   const handleExportReport = async () => {
-    if (!query) {
-      alert('Please enter a query first.');
+    if (!query || !aiOverviewData?.text_blocks) {
+      alert('No analysis results to export. Please analyze a query first.');
       return;
     }
 
@@ -510,6 +555,9 @@ export default function QueryAnalysisPage() {
         });
       }
 
+      // Add logo at the end
+      await addLogoToPdf(finalPdf);
+
       finalPdf.save(`query-analysis-${query}-${new Date().toISOString().split('T')[0]}.pdf`);
       setExportProgress('Export completed successfully!');
     } catch (error) {
@@ -665,6 +713,9 @@ export default function QueryAnalysisPage() {
           finalPdf.setTextColor(0, 0, 0);
         }
       }
+
+      // Add logo to the last page
+      await addLogoToPdf(finalPdf);
 
       // Save the combined report
       finalPdf.save(`full-analysis-report-${new Date().toISOString().split('T')[0]}.pdf`);

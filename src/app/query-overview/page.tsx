@@ -257,6 +257,51 @@ export default function KeywordsPage() {
     return Math.round(averageScore * 100) / 100;
   }, [keywords]);
 
+  const addLogoToPdf = async (pdf: any) => {
+    try {
+      // Create an Image element to load the logo
+      const img = new Image();
+      img.src = '/images/enception_logo.png';
+      
+      // Wait for the image to load
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      // Calculate dimensions to maintain aspect ratio (smaller size)
+      const imgWidth = 15; // mm - small size
+      const imgHeight = (img.height * imgWidth) / img.width;
+
+      // Add logo to all pages
+      const pageCount = pdf.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        pdf.setPage(i);
+        // Add logo at the bottom right of each page
+        pdf.addImage(
+          img, 
+          'PNG', 
+          pdf.internal.pageSize.width - imgWidth - 5, // 5mm from right
+          pdf.internal.pageSize.height - imgHeight - 5, // 5mm from bottom
+          imgWidth, 
+          imgHeight
+        );
+        
+        // Add "Generated with Enception.AI" text
+        pdf.setFontSize(6); // Smaller text
+        pdf.setTextColor(128, 128, 128);
+        pdf.text(
+          'Generated with Enception.AI', 
+          pdf.internal.pageSize.width - 5, 
+          pdf.internal.pageSize.height - 3, 
+          { align: 'right' }
+        );
+      }
+    } catch (error) {
+      console.error('Failed to add logo:', error);
+    }
+  };
+
   const handleExport = async () => {
     if (!contentRef.current) return;
 
@@ -282,7 +327,7 @@ export default function KeywordsPage() {
       
       const scoreTitle = document.createElement('h2');
       scoreTitle.textContent = 'AI Visibility Score';
-      scoreTitle.style.cssText = 'font-size: 24px; font-weight: 600; color: #000;';
+      scoreTitle.style.cssText = 'font-size: 24px; font-weight: 600; color: #000; margin-bottom: 8px;';
       
       const scoreValue = document.createElement('div');
       scoreValue.style.cssText = 'font-size: 36px; font-weight: 700; color: #6659df;';
@@ -386,6 +431,9 @@ export default function KeywordsPage() {
       // Create PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
       pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
+
+      // Add logo to all pages
+      await addLogoToPdf(pdf);
 
       // Download the PDF
       pdf.save(`keyword-analysis-${new Date().toISOString().split('T')[0]}.pdf`);
