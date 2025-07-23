@@ -383,6 +383,7 @@ export default function QueryAnalysisPage() {
 
     try {
       setIsExporting(true);
+      setExportError(null);
       const jsPDF = (await import('jspdf')).default;
       const finalPdf = new jsPDF();
 
@@ -401,172 +402,156 @@ export default function QueryAnalysisPage() {
         finalPdf.setTextColor(0, 0, 0);
         finalPdf.text('AI Overview', 20, yPosition);
         yPosition += 10;
+
         aiOverviewData.text_blocks.forEach(block => {
           if (block.type === 'paragraph' && block.snippet) {
             finalPdf.setFontSize(12);
             finalPdf.setTextColor(0, 0, 0);
-            finalPdf.text(block.snippet, 20, yPosition);
-            yPosition += 10;
+            const lines = finalPdf.splitTextToSize(block.snippet, 170);
+            if (yPosition + (lines.length * 5) > 280) {
+              finalPdf.addPage();
+              yPosition = 20;
+            }
+            finalPdf.text(lines, 20, yPosition);
+            yPosition += lines.length * 5 + 5;
           } else if (block.type === 'list' && block.list) {
-            finalPdf.setFontSize(12);
-            finalPdf.setTextColor(0, 0, 0);
             block.list.forEach(item => {
+              if (yPosition > 270) {
+                finalPdf.addPage();
+                yPosition = 20;
+              }
               if (item.title) {
+                finalPdf.setFontSize(12);
                 finalPdf.text(`• ${item.title}`, 20, yPosition);
+                yPosition += 5;
                 if (item.snippet) {
                   finalPdf.setTextColor(100, 100, 100);
-                  finalPdf.text(item.snippet, 20, yPosition + 5);
+                  const lines = finalPdf.splitTextToSize(item.snippet, 160);
+                  finalPdf.text(lines, 25, yPosition);
+                  yPosition += lines.length * 5;
                   finalPdf.setTextColor(0, 0, 0);
                 }
-                yPosition += 10;
+                yPosition += 5;
               }
             });
           }
         });
       }
 
-      // Optimization Analysis Section
-      if (aiOverviewData?.references?.length) {
-        yPosition += 10;
-        finalPdf.setFontSize(18);
-        finalPdf.setTextColor(0, 0, 0);
-        finalPdf.text('Optimization Analysis', 20, yPosition);
-        yPosition += 10;
-
-        // Reference Analysis
-        finalPdf.setFontSize(12);
-        finalPdf.setTextColor(0, 0, 0);
-        finalPdf.text('Reference Analysis', 20, yPosition);
-        const domains = new Set(aiOverviewData.references.map(ref => new URL(ref.link).hostname));
-        finalPdf.text(`Number of unique source domains: ${domains.size}`, 20, yPosition + 5);
-        finalPdf.text(`Total references: ${aiOverviewData.references.length}`, 20, yPosition + 10);
-        yPosition += 15;
-
-        // Competitor Analysis
-        finalPdf.setFontSize(12);
-        finalPdf.setTextColor(0, 0, 0);
-        finalPdf.text('Competitor Analysis', 20, yPosition);
-        const competitors = aiOverviewData.references.reduce((acc, ref) => {
-          const domain = new URL(ref.link).hostname;
-          acc[domain] = (acc[domain] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>);
-
-        Object.entries(competitors)
-          .sort(([, a], [, b]) => b - a)
-          .slice(0, 5)
-          .forEach(([domain, count]) => {
-            finalPdf.text(`• ${domain}: ${count} references`, 20, yPosition);
-            yPosition += 5;
-          });
-      }
-
       // References Section
       if (aiOverviewData?.references?.length) {
+        if (yPosition > 250) {
+          finalPdf.addPage();
+          yPosition = 20;
+        }
         yPosition += 10;
         finalPdf.setFontSize(18);
         finalPdf.setTextColor(0, 0, 0);
         finalPdf.text('References', 20, yPosition);
         yPosition += 10;
-        
+
         aiOverviewData.references.forEach((ref, index) => {
+          if (yPosition > 250) {
+            finalPdf.addPage();
+            yPosition = 20;
+          }
           if (ref.title) {
-            const refText = `${index + 1}. ${ref.title}`;
             finalPdf.setFontSize(11);
             finalPdf.setTextColor(0, 0, 0);
-            finalPdf.text(refText, 20, yPosition);
+            const titleLines = finalPdf.splitTextToSize(`${index + 1}. ${ref.title}`, 170);
+            finalPdf.text(titleLines, 20, yPosition);
+            yPosition += titleLines.length * 5;
+
             if (ref.snippet) {
               finalPdf.setTextColor(100, 100, 100);
-              finalPdf.text(ref.snippet, 20, yPosition + 5);
-              finalPdf.setTextColor(0, 0, 0);
+              const snippetLines = finalPdf.splitTextToSize(ref.snippet, 170);
+              finalPdf.text(snippetLines, 20, yPosition);
+              yPosition += snippetLines.length * 5;
             }
-            finalPdf.text(`Source: ${ref.source}`, 20, yPosition + 10);
-            yPosition += 15;
+
+            if (ref.source) {
+              finalPdf.setFontSize(9);
+              finalPdf.text(`Source: ${ref.source}`, 20, yPosition);
+              yPosition += 8;
+            }
+
+            finalPdf.setTextColor(0, 0, 0);
           }
         });
       }
 
-      // SERP Analysis Section
-      if (organicResults.length) {
-        yPosition += 10;
-        finalPdf.setFontSize(18);
-        finalPdf.setTextColor(0, 0, 0);
-        finalPdf.text('SERP Analysis', 20, yPosition);
-        yPosition += 10;
-
-        // SERP Features
-        finalPdf.setFontSize(12);
-        finalPdf.setTextColor(0, 0, 0);
-        finalPdf.text('SERP Features', 20, yPosition);
-        const features = {
-          'Organic Results': organicResults.length,
-          'Rich Snippets': organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions).length,
-          'Sitelinks': organicResults.filter(r => (r.sitelinks?.list?.length || 0) > 0).length
-        };
-
-        Object.entries(features).forEach(([label, value]) => {
-          finalPdf.text(`${label}: ${value}`, 20, yPosition);
-          yPosition += 5;
-        });
-
-        // Content Types
-        finalPdf.setFontSize(12);
-        finalPdf.setTextColor(0, 0, 0);
-        finalPdf.text('Content Types', 20, yPosition);
-        const contentTypes = {
-          'Visual Content': organicResults.filter(r => r.thumbnail).length,
-          'Reviews': organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions?.rating).length,
-          'Products': organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions?.price).length
-        };
-
-        Object.entries(contentTypes).forEach(([label, value]) => {
-          finalPdf.text(`${label}: ${value}`, 20, yPosition);
-          yPosition += 5;
-        });
-      }
-
       // Organic Results Section
-      if (organicResults.length) {
+      if (organicResults?.length) {
+        if (yPosition > 250) {
+          finalPdf.addPage();
+          yPosition = 20;
+        }
         yPosition += 10;
         finalPdf.setFontSize(18);
         finalPdf.setTextColor(0, 0, 0);
         finalPdf.text('Organic Results', 20, yPosition);
         yPosition += 10;
-        
+
         organicResults.forEach((result, index) => {
-          finalPdf.setFontSize(12);
-          finalPdf.setTextColor(0, 0, 0);
-          finalPdf.text(`${index + 1}. ${result.title}`, 20, yPosition);
-          if (result.displayed_link) {
-            finalPdf.setTextColor(100, 100, 100);
-            finalPdf.text(result.displayed_link, 20, yPosition + 5);
-          }
-          finalPdf.setTextColor(0, 0, 0);
-          if (result.snippet) {
-            finalPdf.text(result.snippet, 20, yPosition + 5);
+          if (yPosition > 250) {
+            finalPdf.addPage();
+            yPosition = 20;
           }
 
-          // Add rich snippet info if available
+          // Title with rank
+          finalPdf.setFontSize(12);
+          finalPdf.setTextColor(brand?.color || '#6659df');
+          const titleLines = finalPdf.splitTextToSize(`${index + 1}. ${result.title}`, 170);
+          finalPdf.text(titleLines, 20, yPosition);
+          yPosition += titleLines.length * 5;
+
+          // URL
+          if (result.displayed_link) {
+            finalPdf.setFontSize(10);
+            finalPdf.setTextColor(100, 100, 100);
+            finalPdf.text(result.displayed_link, 20, yPosition);
+            yPosition += 5;
+          }
+
+          // Snippet
+          if (result.snippet) {
+            finalPdf.setFontSize(11);
+            finalPdf.setTextColor(0, 0, 0);
+            const snippetLines = finalPdf.splitTextToSize(result.snippet, 170);
+            finalPdf.text(snippetLines, 20, yPosition);
+            yPosition += snippetLines.length * 5;
+          }
+
+          // Rich snippet info
           if (result.rich_snippet?.bottom?.detected_extensions) {
             const ext = result.rich_snippet.bottom.detected_extensions;
-            if (ext.rating) finalPdf.text(`Rating: ${ext.rating}/5 (${ext.reviews} reviews)`, 20, yPosition + 5);
-            if (ext.price) finalPdf.text(`Price: ${ext.currency}${ext.price}`, 20, yPosition + 5);
+            finalPdf.setFontSize(10);
+            finalPdf.setTextColor(100, 100, 100);
+            if (ext.rating) {
+              finalPdf.text(`Rating: ${ext.rating}/5 (${ext.reviews} reviews)`, 20, yPosition);
+              yPosition += 5;
+            }
+            if (ext.price) {
+              finalPdf.text(`Price: ${ext.currency}${ext.price}`, 20, yPosition);
+              yPosition += 5;
+            }
           }
 
-          // Add sitelinks if available
+          // Sitelinks
           if (result.sitelinks?.list?.length) {
             finalPdf.setFontSize(10);
-            finalPdf.setTextColor(102, 89, 223);
-            finalPdf.text('Sitelinks:', 20, yPosition + 5);
+            finalPdf.setTextColor(brand?.color || '#6659df');
+            finalPdf.text('Sitelinks:', 20, yPosition);
+            yPosition += 5;
             result.sitelinks.list.forEach(link => {
               if (link.title) {
-                finalPdf.text(`- ${link.title}`, 20, yPosition + 10);
+                finalPdf.text(`- ${link.title}`, 25, yPosition);
+                yPosition += 5;
               }
             });
-            finalPdf.setTextColor(0, 0, 0);
           }
 
-          yPosition += 15;
+          yPosition += 10; // Space between results
         });
       }
 
@@ -580,7 +565,7 @@ export default function QueryAnalysisPage() {
       setExportProgress('Export completed successfully!');
     } catch (error) {
       console.error('Failed to generate report:', error);
-      alert('Failed to generate report. Please try again.');
+      setExportError(error instanceof Error ? error.message : 'Failed to export PDF. Please try again.');
     } finally {
       setIsExporting(false);
       setTimeout(() => setExportProgress(''), 3000);
