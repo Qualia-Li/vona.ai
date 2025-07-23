@@ -114,10 +114,6 @@ export default function WebsiteInputPage() {
               )}
             </CardContent>
           </Card>
-
-          <div className="mt-8">
-            <AnalysisLinks url={url} />
-          </div>
         </>
       )}
 
@@ -145,7 +141,11 @@ export default function WebsiteInputPage() {
           </CardContent>
         </Card>
       )}
-
+      
+      <div className='mt-8'>
+        <AnalysisLinks url={url} />
+      </div>
+      
       <div className='mt-8 grid gap-4'>
         <Card>
           <CardHeader>
