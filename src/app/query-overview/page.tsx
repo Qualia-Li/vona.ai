@@ -2,6 +2,7 @@
 
 import { ArrowUpDown, LayoutGrid, Plus, Table as TableIcon, RefreshCw, CheckCircle2, XCircle, Hourglass, Trash2, Download } from 'lucide-react';
 import { useState, useMemo, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ interface KeywordWithStatus extends Keyword {
 }
 
 export default function KeywordsPage() {
+  const router = useRouter();
   const keywords = useKeywordsStore((state) => state.keywords) as KeywordWithStatus[];
   const deleteKeyword = useKeywordsStore((state) => state.deleteKeyword);
   const addKeyword = useKeywordsStore((state) => state.addKeyword);
@@ -190,6 +192,10 @@ export default function KeywordsPage() {
   const handleClearAll = () => {
     clearKeywords();
     setIsClearDialogOpen(false);
+  };
+
+  const handleQueryClick = (query: string) => {
+    router.push(`/query-analysis?query=${encodeURIComponent(query)}`);
   };
 
   const getStatusIcon = (keyword: KeywordWithStatus) => {
@@ -626,7 +632,10 @@ export default function KeywordsPage() {
                       </div>
                     </TableCell>
                     <TableCell className='font-medium'>
-                      <div>
+                      <div 
+                        className='cursor-pointer hover:text-primary transition-colors'
+                        onClick={() => handleQueryClick(keyword.term)}
+                      >
                         {keyword.term}
                         {keyword.isCustom && (
                           <Badge variant='secondary' className='ml-2'>
@@ -687,7 +696,10 @@ export default function KeywordsPage() {
             {sortedKeywords.map((keyword) => (
               <Card key={keyword.id} className='bg-white'>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <div className='flex items-center gap-4'>
+                  <div 
+                    className='flex items-center gap-4 cursor-pointer hover:text-primary transition-colors'
+                    onClick={() => handleQueryClick(keyword.term)}
+                  >
                     {getStatusIcon(keyword)}
                     <div>
                       <CardTitle className='text-lg font-medium'>{keyword.term}</CardTitle>
