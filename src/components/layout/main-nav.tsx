@@ -12,7 +12,7 @@ const items = [
   },
   {
     title: 'Query Overview',
-    href: '/keywords',
+    href: '/query-overview',
   },
   {
     title: 'Query Analysis',
