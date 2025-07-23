@@ -28,12 +28,19 @@ export default function WebsiteInputPage() {
     setIsLoading(true);
 
     try {
+      // Normalize URL if it doesn't start with http:// or https://
+      let normalizedUrl = url;
+      if (url.includes('.') && !url.startsWith('http://') && !url.startsWith('https://')) {
+        normalizedUrl = `https://${url}`;
+        setUrl(normalizedUrl); // Update the input field
+      }
+
       const response = await fetch('/api/keywords', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url: normalizedUrl }),
       });
 
       if (!response.ok) {
@@ -76,7 +83,7 @@ export default function WebsiteInputPage() {
           <form onSubmit={handleAnalyze} className='space-y-4'>
             <div className='flex gap-2'>
               <Input
-                type='url'
+                type='text'
                 placeholder='https://your-website.com'
                 className='flex-1'
                 value={url}
