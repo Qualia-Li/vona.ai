@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useKeywordsStore } from '@/lib/store/keywordsStore';
 import { useSearchResults } from '@/lib/store/searchResultsStore';
-import { OrganicResult } from '@/types/aiOverview';
+import { OrganicResult, Reference } from '@/types/aiOverview';
 import { useBrandStore } from '@/lib/store/brandStore';
 
 import { fetchAIOverview } from '@/lib/api/aiOverview';
@@ -375,6 +375,181 @@ export default function QueryAnalysisPage() {
     }
   };
 
+  // Add this reusable function for organic results
+  const addOrganicResultsToPdf = (pdf: any, results: OrganicResult[], startY: number) => {
+    let yPosition = startY;
+
+    if (results?.length) {
+      if (yPosition > 250) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      yPosition += 10;
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('Organic Results', 20, yPosition);
+      yPosition += 10;
+
+      results.forEach((result, index) => {
+        if (yPosition > 250) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+
+        // Title with rank
+        pdf.setFontSize(12);
+        pdf.setTextColor(brand?.color || '#6659df');
+        const titleLines = pdf.splitTextToSize(`${index + 1}. ${result.title}`, 170);
+        pdf.text(titleLines, 20, yPosition);
+        yPosition += titleLines.length * 5;
+
+        // URL
+        if (result.displayed_link) {
+          pdf.setFontSize(10);
+          pdf.setTextColor(100, 100, 100);
+          pdf.text(result.displayed_link, 20, yPosition);
+          yPosition += 5;
+        }
+
+        // Snippet
+        if (result.snippet) {
+          pdf.setFontSize(11);
+          pdf.setTextColor(0, 0, 0);
+          const snippetLines = pdf.splitTextToSize(result.snippet, 170);
+          pdf.text(snippetLines, 20, yPosition);
+          yPosition += snippetLines.length * 5;
+        }
+
+        // Rich snippet info
+        if (result.rich_snippet?.bottom?.detected_extensions) {
+          const ext = result.rich_snippet.bottom.detected_extensions;
+          pdf.setFontSize(10);
+          pdf.setTextColor(100, 100, 100);
+          if (ext.rating) {
+            pdf.text(`Rating: ${ext.rating}/5 (${ext.reviews} reviews)`, 20, yPosition);
+            yPosition += 5;
+          }
+          if (ext.price) {
+            pdf.text(`Price: ${ext.currency}${ext.price}`, 20, yPosition);
+            yPosition += 5;
+          }
+        }
+
+        // Sitelinks
+        if (result.sitelinks?.list?.length) {
+          pdf.setFontSize(10);
+          pdf.setTextColor(brand?.color || '#6659df');
+          pdf.text('Sitelinks:', 20, yPosition);
+          yPosition += 5;
+          result.sitelinks.list.forEach(link => {
+            if (link.title) {
+              pdf.text(`- ${link.title}`, 25, yPosition);
+              yPosition += 5;
+            }
+          });
+        }
+
+        yPosition += 10; // Space between results
+      });
+    }
+    return yPosition;
+  };
+
+  // Add reusable function for optimization analysis
+  const addOptimizationAnalysisToPdf = (pdf: any, references: Reference[], startY: number) => {
+    let yPosition = startY;
+
+    if (references?.length) {
+      if (yPosition > 250) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      yPosition += 10;
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('Optimization Analysis', 20, yPosition);
+      yPosition += 10;
+
+      // Reference Analysis
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('Reference Analysis', 20, yPosition);
+      const domains = new Set(references.map(ref => new URL(ref.link).hostname));
+      pdf.text(`Number of unique source domains: ${domains.size}`, 20, yPosition + 5);
+      pdf.text(`Total references: ${references.length}`, 20, yPosition + 10);
+      yPosition += 15;
+
+      // Competitor Analysis
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('Competitor Analysis', 20, yPosition);
+      yPosition += 5;
+
+      const competitors = references.reduce((acc, ref) => {
+        const domain = new URL(ref.link).hostname;
+        acc[domain] = (acc[domain] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      Object.entries(competitors)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
+        .slice(0, 5)
+        .forEach(([domain, count]) => {
+          pdf.text(`• ${domain}: ${count} references`, 20, yPosition);
+          yPosition += 5;
+        });
+      yPosition += 5;
+    }
+    return yPosition;
+  };
+
+  // Add reusable function for references
+  const addReferencesToPdf = (pdf: any, references: Reference[], startY: number) => {
+    let yPosition = startY;
+
+    if (references?.length) {
+      if (yPosition > 250) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      yPosition += 10;
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('References', 20, yPosition);
+      yPosition += 10;
+
+      references.forEach((ref, index) => {
+        if (yPosition > 250) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+        if (ref.title) {
+          pdf.setFontSize(11);
+          pdf.setTextColor(0, 0, 0);
+          const titleLines = pdf.splitTextToSize(`${index + 1}. ${ref.title}`, 170);
+          pdf.text(titleLines, 20, yPosition);
+          yPosition += titleLines.length * 5;
+
+          if (ref.snippet) {
+            pdf.setTextColor(100, 100, 100);
+            const snippetLines = pdf.splitTextToSize(ref.snippet, 170);
+            pdf.text(snippetLines, 20, yPosition);
+            yPosition += snippetLines.length * 5;
+          }
+
+          if (ref.source) {
+            pdf.setFontSize(9);
+            pdf.text(`Source: ${ref.source}`, 20, yPosition);
+            yPosition += 8;
+          }
+
+          pdf.setTextColor(0, 0, 0);
+        }
+      });
+    }
+    return yPosition;
+  };
+
   const handleExportReport = async () => {
     if (!query || !aiOverviewData?.text_blocks) {
       alert('No analysis results to export. Please analyze a query first.');
@@ -438,122 +613,18 @@ export default function QueryAnalysisPage() {
         });
       }
 
-      // References Section
-      if (aiOverviewData?.references?.length) {
-        if (yPosition > 250) {
-          finalPdf.addPage();
-          yPosition = 20;
-        }
-        yPosition += 10;
-        finalPdf.setFontSize(18);
-        finalPdf.setTextColor(0, 0, 0);
-        finalPdf.text('References', 20, yPosition);
-        yPosition += 10;
-
-        aiOverviewData.references.forEach((ref, index) => {
-          if (yPosition > 250) {
-            finalPdf.addPage();
-            yPosition = 20;
-          }
-          if (ref.title) {
-            finalPdf.setFontSize(11);
-            finalPdf.setTextColor(0, 0, 0);
-            const titleLines = finalPdf.splitTextToSize(`${index + 1}. ${ref.title}`, 170);
-            finalPdf.text(titleLines, 20, yPosition);
-            yPosition += titleLines.length * 5;
-
-            if (ref.snippet) {
-              finalPdf.setTextColor(100, 100, 100);
-              const snippetLines = finalPdf.splitTextToSize(ref.snippet, 170);
-              finalPdf.text(snippetLines, 20, yPosition);
-              yPosition += snippetLines.length * 5;
-            }
-
-            if (ref.source) {
-              finalPdf.setFontSize(9);
-              finalPdf.text(`Source: ${ref.source}`, 20, yPosition);
-              yPosition += 8;
-            }
-
-            finalPdf.setTextColor(0, 0, 0);
-          }
-        });
+      // Add Optimization Analysis Section
+      if (aiOverviewData?.references) {
+        yPosition = addOptimizationAnalysisToPdf(finalPdf, aiOverviewData.references, yPosition);
       }
 
-      // Organic Results Section
-      if (organicResults?.length) {
-        if (yPosition > 250) {
-          finalPdf.addPage();
-          yPosition = 20;
-        }
-        yPosition += 10;
-        finalPdf.setFontSize(18);
-        finalPdf.setTextColor(0, 0, 0);
-        finalPdf.text('Organic Results', 20, yPosition);
-        yPosition += 10;
-
-        organicResults.forEach((result, index) => {
-          if (yPosition > 250) {
-            finalPdf.addPage();
-            yPosition = 20;
-          }
-
-          // Title with rank
-          finalPdf.setFontSize(12);
-          finalPdf.setTextColor(brand?.color || '#6659df');
-          const titleLines = finalPdf.splitTextToSize(`${index + 1}. ${result.title}`, 170);
-          finalPdf.text(titleLines, 20, yPosition);
-          yPosition += titleLines.length * 5;
-
-          // URL
-          if (result.displayed_link) {
-            finalPdf.setFontSize(10);
-            finalPdf.setTextColor(100, 100, 100);
-            finalPdf.text(result.displayed_link, 20, yPosition);
-            yPosition += 5;
-          }
-
-          // Snippet
-          if (result.snippet) {
-            finalPdf.setFontSize(11);
-            finalPdf.setTextColor(0, 0, 0);
-            const snippetLines = finalPdf.splitTextToSize(result.snippet, 170);
-            finalPdf.text(snippetLines, 20, yPosition);
-            yPosition += snippetLines.length * 5;
-          }
-
-          // Rich snippet info
-          if (result.rich_snippet?.bottom?.detected_extensions) {
-            const ext = result.rich_snippet.bottom.detected_extensions;
-            finalPdf.setFontSize(10);
-            finalPdf.setTextColor(100, 100, 100);
-            if (ext.rating) {
-              finalPdf.text(`Rating: ${ext.rating}/5 (${ext.reviews} reviews)`, 20, yPosition);
-              yPosition += 5;
-            }
-            if (ext.price) {
-              finalPdf.text(`Price: ${ext.currency}${ext.price}`, 20, yPosition);
-              yPosition += 5;
-            }
-          }
-
-          // Sitelinks
-          if (result.sitelinks?.list?.length) {
-            finalPdf.setFontSize(10);
-            finalPdf.setTextColor(brand?.color || '#6659df');
-            finalPdf.text('Sitelinks:', 20, yPosition);
-            yPosition += 5;
-            result.sitelinks.list.forEach(link => {
-              if (link.title) {
-                finalPdf.text(`- ${link.title}`, 25, yPosition);
-                yPosition += 5;
-              }
-            });
-          }
-
-          yPosition += 10; // Space between results
-        });
+      // Add References Section
+      if (aiOverviewData?.references) {
+        yPosition = addReferencesToPdf(finalPdf, aiOverviewData.references, yPosition);
       }
+
+      // Add Organic Results Section
+      yPosition = addOrganicResultsToPdf(finalPdf, organicResults, yPosition);
 
       // Add logo to all pages
       await addLogoToPdf(finalPdf);
@@ -582,7 +653,6 @@ export default function QueryAnalysisPage() {
       setIsGeneratingReport(true);
       const jsPDF = (await import('jspdf')).default;
       const finalPdf = new jsPDF();
-      let currentPage = 1;
 
       // Add header with brand and report info
       let yPosition = addHeaderToPdf(finalPdf, 'Full Keywords Analysis Report');
@@ -602,7 +672,6 @@ export default function QueryAnalysisPage() {
           // Add page break except for first keyword
           if (i > 0) {
             finalPdf.addPage();
-            currentPage++;
             yPosition = 20;
           }
 
@@ -629,13 +698,8 @@ export default function QueryAnalysisPage() {
           }
           yPosition += 5;
 
-          // Add AI Overview content
+          // Add AI Overview content if available
           if (data?.ai_overview?.text_blocks?.length) {
-            if (yPosition > 250) {
-              finalPdf.addPage();
-              currentPage++;
-              yPosition = 20;
-            }
             finalPdf.setFontSize(14);
             finalPdf.text('AI Overview', 20, yPosition);
             yPosition += 10;
@@ -643,7 +707,6 @@ export default function QueryAnalysisPage() {
             data.ai_overview.text_blocks.forEach(block => {
               if (yPosition > 250) {
                 finalPdf.addPage();
-                currentPage++;
                 yPosition = 20;
               }
 
@@ -656,7 +719,6 @@ export default function QueryAnalysisPage() {
                 block.list.forEach(item => {
                   if (yPosition > 250) {
                     finalPdf.addPage();
-                    currentPage++;
                     yPosition = 20;
                   }
                   if (item.title) {
@@ -677,11 +739,25 @@ export default function QueryAnalysisPage() {
             });
           }
 
+          // Add Optimization Analysis if available
+          if (data?.ai_overview?.references) {
+            yPosition = addOptimizationAnalysisToPdf(finalPdf, data.ai_overview.references, yPosition);
+          }
+
+          // Add References if available
+          if (data?.ai_overview?.references) {
+            yPosition = addReferencesToPdf(finalPdf, data.ai_overview.references, yPosition);
+          }
+
+          // Add organic results if available
+          if (data?.organic_results?.length) {
+            yPosition = addOrganicResultsToPdf(finalPdf, data.organic_results, yPosition);
+          }
+
         } catch (error) {
           console.error(`Error analyzing keyword "${keyword.term}":`, error);
           if (yPosition > 250) {
             finalPdf.addPage();
-            currentPage++;
             yPosition = 20;
           }
           finalPdf.setFontSize(12);
