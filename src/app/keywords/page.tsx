@@ -497,24 +497,36 @@ export default function KeywordsPage() {
 
         {/* Status Message */}
         {analysisStatus !== 'idle' && (
-          <div
-            className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${
+          <div className='flex items-center gap-2 justify-end'> {/* Added justify-end for right alignment */}
+            <div
+              className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${
+                analysisStatus === 'analyzing'
+                  ? 'bg-blue-50 text-blue-700'
+                  : analysisStatus === 'success'
+                    ? 'bg-green-50 text-green-700'
+                    : 'bg-red-50 text-red-700'
+              }`}
+            >
+              {analysisStatus === 'analyzing' ? (
+                <RefreshCw className='h-5 w-5 animate-spin' />
+              ) : analysisStatus === 'success' ? (
+                <CheckCircle2 className='h-5 w-5' />
+              ) : (
+                <XCircle className='h-5 w-5' />
+              )}
+            </div>
+            {/* Added text message */}
+            <span className={`text-sm ${
               analysisStatus === 'analyzing'
-                ? 'bg-blue-50 text-blue-700'
+                ? 'text-blue-700'
                 : analysisStatus === 'success'
-                  ? 'bg-green-50 text-green-700'
-                  : 'bg-red-50 text-red-700'
-            }`}
-          >
-            {analysisStatus === 'analyzing' ? (
-              <RefreshCw className='h-5 w-5 animate-spin' />
-            ) : analysisStatus === 'success' ? (
-              <CheckCircle2 className='h-5 w-5' />
-            ) : (
-              <XCircle className='h-5 w-5' />
-            )}
+                  ? 'text-green-700'
+                  : 'text-red-700'
+            }`}>
+              {analysisMessage}
+            </span>
           </div>
-        )}
+        )} {/* rest of empty state handling */}
       </div>
 
       <div ref={contentRef} className='space-y-8 bg-white print:p-8 rounded-lg'>
