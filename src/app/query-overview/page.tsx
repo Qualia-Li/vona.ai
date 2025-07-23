@@ -1,8 +1,9 @@
 'use client';
 
 import { ArrowUpDown, LayoutGrid, Plus, Table as TableIcon, RefreshCw, CheckCircle2, XCircle, Hourglass, Trash2, Download } from 'lucide-react';
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useBrandStore } from '@/lib/store/brandStore';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -42,6 +43,8 @@ export default function KeywordsPage() {
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>('idle');
   const [analysisMessage, setAnalysisMessage] = useState('');
   const contentRef = useRef<HTMLDivElement>(null);
+  const { brand } = useBrandStore();
+  const [isExporting, setIsExporting] = useState(false);
 
   const sortedKeywords = useMemo(() => {
     if (!sortField) {
@@ -257,11 +260,42 @@ export default function KeywordsPage() {
     return Math.round(averageScore * 100) / 100;
   }, [keywords]);
 
+  const addHeaderToPdf = (pdf: any, reportType: string) => {
+    const pageWidth = pdf.internal.pageSize.width;
+    const margin = 20;
+
+    // Add brand name and report type
+    pdf.setFontSize(20);
+    pdf.setTextColor(0, 0, 0);
+    if (brand?.name) {
+      pdf.text(brand.name, margin, 20);
+    }
+    pdf.setFontSize(16);
+    pdf.text(reportType, margin, brand?.name ? 30 : 20);
+
+    // Add date
+    const date = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    pdf.setFontSize(10);
+    pdf.setTextColor(128, 128, 128);
+    pdf.text(date, pageWidth - margin, brand?.name ? 30 : 20, { align: 'right' });
+
+    // Add separator line
+    pdf.setDrawColor(230, 230, 230);
+    pdf.line(margin, brand?.name ? 35 : 25, pageWidth - margin, brand?.name ? 35 : 25);
+
+    // Return the Y position for content to start
+    return brand?.name ? 45 : 35;
+  };
+
   const addLogoToPdf = async (pdf: any) => {
     try {
       // Create an Image element to load the logo
       const img = new Image();
-      img.src = '/images/enception_logo.png';
+      img.src = brand?.logo || '/images/enception_logo.png';
       
       // Wait for the image to load
       await new Promise((resolve, reject) => {
@@ -303,148 +337,130 @@ export default function KeywordsPage() {
   };
 
   const handleExport = async () => {
-    if (!contentRef.current) return;
+    if (keywords.length === 0) {
+      setAnalysisStatus('error');
+      setAnalysisMessage('No keywords to export. Please add some keywords first.');
+      return;
+    }
 
     try {
-      // Dynamically import the libraries only when needed
-      const html2canvas = (await import('html2canvas')).default;
-      const jsPDF = (await import('jspdf')).default;
-
-      // Show loading state
+      setIsExporting(true);
       setAnalysisStatus('analyzing');
       setAnalysisMessage('Generating PDF...');
 
-      // Create export-friendly version of the content
-      const exportDiv = document.createElement('div');
-      exportDiv.style.cssText = 'background: white; padding: 32px; width: 1000px; position: fixed; left: -9999px;';
-      
-      // Create score section
-      const scoreSection = document.createElement('div');
-      scoreSection.style.cssText = 'margin-bottom: 32px; padding: 24px; border: 1px solid #e5e7eb; border-radius: 8px;';
-      
-      const scoreHeader = document.createElement('div');
-      scoreHeader.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;';
-      
-      const scoreTitle = document.createElement('h2');
-      scoreTitle.textContent = 'AI Visibility Score';
-      scoreTitle.style.cssText = 'font-size: 24px; font-weight: 600; color: #000; margin-bottom: 8px;';
-      
-      const scoreValue = document.createElement('div');
-      scoreValue.style.cssText = 'font-size: 36px; font-weight: 700; color: #6659df;';
-      scoreValue.textContent = aiVisibilityScore !== null ? `${aiVisibilityScore}/100` : '—';
-      
-      scoreHeader.appendChild(scoreTitle);
-      scoreHeader.appendChild(scoreValue);
-      scoreSection.appendChild(scoreHeader);
+      const jsPDF = (await import('jspdf')).default;
+      const pdf = new jsPDF();
+      let yPosition = addHeaderToPdf(pdf, 'Keyword Analysis Report');
 
-      // Create table section
-      const tableSection = document.createElement('div');
-      tableSection.style.cssText = 'border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;';
-      
-      const table = document.createElement('table');
-      table.style.cssText = 'width: 100%; border-collapse: collapse;';
-      
-      // Add table header
-      const thead = document.createElement('thead');
-      thead.innerHTML = `
-        <tr style="background: #f9fafb;">
-          <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">Status</th>
-          <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">Query</th>
-          <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">Volume</th>
-          <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">AI Likelihood</th>
-          <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">Difficulty</th>
-          <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb;">Purchase Intent</th>
-        </tr>
-      `;
-      
-      // Add table body
-      const tbody = document.createElement('tbody');
-      sortedKeywords.forEach(keyword => {
-        const tr = document.createElement('tr');
-        tr.style.cssText = 'border-bottom: 1px solid #e5e7eb;';
-        
-        // Status cell
-        const statusCell = document.createElement('td');
-        statusCell.style.cssText = 'padding: 12px;';
-        statusCell.textContent = keyword.analysisStatus === 'success' ? '✓' : 
-                                keyword.analysisStatus === 'error' ? '✗' : 
-                                keyword.analysisStatus === 'analyzing' ? '⟳' : '○';
-        
-        // Query cell
-        const queryCell = document.createElement('td');
-        queryCell.style.cssText = 'padding: 12px; font-weight: 500;';
-        queryCell.textContent = keyword.term;
-        
-        // Volume cell
-        const volumeCell = document.createElement('td');
-        volumeCell.style.cssText = 'padding: 12px;';
-        volumeCell.textContent = keyword.volume?.toLocaleString() || '—';
-        
-        // AI Likelihood cell
-        const aiCell = document.createElement('td');
-        aiCell.style.cssText = 'padding: 12px;';
-        aiCell.textContent = keyword.aiOverviewLikelihood !== undefined ? `${keyword.aiOverviewLikelihood}%` : '—';
-        
-        // Difficulty cell
-        const difficultyCell = document.createElement('td');
-        difficultyCell.style.cssText = 'padding: 12px;';
-        difficultyCell.textContent = keyword.optimizationDifficulty !== undefined ? `${keyword.optimizationDifficulty}%` : '—';
-        
-        // Purchase Intent cell
-        const intentCell = document.createElement('td');
-        intentCell.style.cssText = 'padding: 12px;';
-        intentCell.textContent = keyword.purchaseIntent !== undefined && keyword.purchaseIntent !== null ? 
-          `${keyword.purchaseIntent}%` : 'N/A';
-        
-        tr.appendChild(statusCell);
-        tr.appendChild(queryCell);
-        tr.appendChild(volumeCell);
-        tr.appendChild(aiCell);
-        tr.appendChild(difficultyCell);
-        tr.appendChild(intentCell);
-        tbody.appendChild(tr);
+      // Add AI Visibility Score section
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('AI Visibility Score', 20, yPosition);
+      yPosition += 10;
+
+      pdf.setFontSize(14);
+      pdf.setTextColor(brand?.color || '#6659df');
+      if (aiVisibilityScore !== null) {
+        pdf.text(`${aiVisibilityScore}/100`, 20, yPosition);
+        const analyzedCount = keywords.filter((k) => k.analysisStatus === 'success').length;
+        pdf.setFontSize(10);
+        pdf.setTextColor(128, 128, 128);
+        pdf.text(`Based on ${analyzedCount} analyzed keywords`, 20, yPosition + 5);
+      } else {
+        pdf.text('Not available', 20, yPosition);
+      }
+      yPosition += 20;
+
+      // Add Keywords Table
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('Keywords Overview', 20, yPosition);
+      yPosition += 10;
+
+      // Table headers
+      pdf.setFontSize(10);
+      pdf.setTextColor(128, 128, 128);
+      const headers = ['Query', 'Volume', 'AI Likelihood', 'Difficulty', 'Purchase Intent', 'Status'];
+      const colWidths = [60, 25, 25, 25, 25, 20];
+      let xPosition = 20;
+      headers.forEach((header, i) => {
+        pdf.text(header, xPosition, yPosition);
+        xPosition += colWidths[i];
       });
-      
-      table.appendChild(thead);
-      table.appendChild(tbody);
-      tableSection.appendChild(table);
+      yPosition += 5;
 
-      // Combine all sections
-      exportDiv.appendChild(scoreSection);
-      exportDiv.appendChild(tableSection);
-      document.body.appendChild(exportDiv);
+      // Draw header separator
+      pdf.setDrawColor(230, 230, 230);
+      pdf.line(20, yPosition, 190, yPosition);
+      yPosition += 5;
 
-      // Create canvas from the simplified content
-      const canvas = await html2canvas(exportDiv, {
-        scale: 2,
-        logging: false,
-        backgroundColor: '#ffffff',
+      // Table rows
+      pdf.setFontSize(9);
+      pdf.setTextColor(0, 0, 0);
+      sortedKeywords.forEach((keyword) => {
+        if (yPosition > 270) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+
+        xPosition = 20;
+        // Query
+        pdf.text(keyword.term, xPosition, yPosition);
+        xPosition += 60;
+
+        // Volume
+        pdf.text(keyword.volume?.toLocaleString() || '—', xPosition, yPosition);
+        xPosition += 25;
+
+        // AI Likelihood
+        pdf.text(keyword.aiOverviewLikelihood !== undefined ? `${keyword.aiOverviewLikelihood}%` : '—', xPosition, yPosition);
+        xPosition += 25;
+
+        // Difficulty
+        pdf.text(keyword.optimizationDifficulty !== undefined ? `${keyword.optimizationDifficulty}%` : '—', xPosition, yPosition);
+        xPosition += 25;
+
+        // Purchase Intent
+        pdf.text(
+          keyword.purchaseIntent !== undefined && keyword.purchaseIntent !== null
+            ? `${keyword.purchaseIntent}%`
+            : 'N/A',
+          xPosition,
+          yPosition
+        );
+        xPosition += 25;
+
+        // Status
+        const status = keyword.analysisStatus === 'success' ? '✓' :
+                      keyword.analysisStatus === 'error' ? '✗' :
+                      keyword.analysisStatus === 'analyzing' ? '⟳' : '○';
+        pdf.text(status, xPosition, yPosition);
+
+        yPosition += 8;
       });
-
-      // Remove the temporary export div
-      document.body.removeChild(exportDiv);
-
-      // Calculate dimensions to fit on A4
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Create PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
 
       // Add logo to all pages
       await addLogoToPdf(pdf);
 
-      // Download the PDF
-      pdf.save(`keyword-analysis-${new Date().toISOString().split('T')[0]}.pdf`);
+      // Save with formatted name
+      const date = new Date().toISOString().split('T')[0];
+      const brandPrefix = brand?.name ? `${brand.name}-` : '';
+      pdf.save(`${brandPrefix}keyword-analysis-${date}.pdf`);
 
-      // Reset status
       setAnalysisStatus('success');
       setAnalysisMessage('PDF exported successfully');
     } catch (error) {
       console.error('Failed to export PDF:', error);
       setAnalysisStatus('error');
       setAnalysisMessage('Failed to export PDF. Please try again.');
+    } finally {
+      setIsExporting(false);
+      setTimeout(() => {
+        if (analysisStatus !== 'analyzing') {
+          setAnalysisStatus('idle');
+          setAnalysisMessage('');
+        }
+      }, 3000);
     }
   };
 
@@ -543,7 +559,7 @@ export default function KeywordsPage() {
           </Dialog>
 
           {/* export pdf */}
-          <Button variant='outline' onClick={handleExport} disabled={keywords.length === 0}>
+          <Button variant='outline' onClick={handleExport} disabled={keywords.length === 0 || isExporting}>
             <Download className='h-4 w-4 mr-2' />
             Export PDF
           </Button>

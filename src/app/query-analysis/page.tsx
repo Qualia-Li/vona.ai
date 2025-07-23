@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useKeywordsStore } from '@/lib/store/keywordsStore';
 import { useSearchResults } from '@/lib/store/searchResultsStore';
 import { OrganicResult } from '@/types/aiOverview';
+import { useBrandStore } from '@/lib/store/brandStore';
 
 import { fetchAIOverview } from '@/lib/api/aiOverview';
 
@@ -56,6 +57,7 @@ export default function QueryAnalysisPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [reportProgress, setReportProgress] = useState<string>('');
+  const { brand } = useBrandStore();
 
   // Handle URL query parameter on mount and changes
   useEffect(() => {
@@ -297,11 +299,42 @@ export default function QueryAnalysisPage() {
     }
   };
 
+  const addHeaderToPdf = (pdf: any, reportType: string) => {
+    const pageWidth = pdf.internal.pageSize.width;
+    const margin = 20;
+
+    // Add brand name and report type
+    pdf.setFontSize(20);
+    pdf.setTextColor(0, 0, 0);
+    if (brand?.name) {
+      pdf.text(brand.name, margin, 20);
+    }
+    pdf.setFontSize(16);
+    pdf.text(reportType, margin, brand?.name ? 30 : 20);
+
+    // Add date
+    const date = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    pdf.setFontSize(10);
+    pdf.setTextColor(128, 128, 128);
+    pdf.text(date, pageWidth - margin, brand?.name ? 30 : 20, { align: 'right' });
+
+    // Add separator line
+    pdf.setDrawColor(230, 230, 230);
+    pdf.line(margin, brand?.name ? 35 : 25, pageWidth - margin, brand?.name ? 35 : 25);
+
+    // Return the Y position for content to start
+    return brand?.name ? 45 : 35;
+  };
+
   const addLogoToPdf = async (pdf: any) => {
     try {
       // Create an Image element to load the logo
       const img = new Image();
-      img.src = '/images/enception_logo.png';
+      img.src = brand?.logo || '/images/enception_logo.png';
       
       // Wait for the image to load
       await new Promise((resolve, reject) => {
@@ -310,7 +343,7 @@ export default function QueryAnalysisPage() {
       });
 
       // Calculate dimensions to maintain aspect ratio (smaller size)
-      const imgWidth = 15; // mm - much smaller
+      const imgWidth = 15; // mm - small size
       const imgHeight = (img.height * imgWidth) / img.width;
 
       // Add logo to all pages
@@ -352,79 +385,40 @@ export default function QueryAnalysisPage() {
       setIsExporting(true);
       const jsPDF = (await import('jspdf')).default;
       const finalPdf = new jsPDF();
-      let currentPage = 1;
-      let yPosition = 20;
-      const margin = 20;
-      const contentWidth = 170;
 
-      const addHeading = (text: string, size = 16) => {
-        if (yPosition > 270) {
-          finalPdf.addPage();
-          currentPage++;
-          yPosition = 20;
-        }
-        finalPdf.setFontSize(size);
-        finalPdf.setTextColor(0, 0, 0);
-        finalPdf.text(text, margin, yPosition);
-        yPosition += size / 2 + 3;
-      };
+      // Add header with brand and report info
+      let yPosition = addHeaderToPdf(finalPdf, 'Query Analysis Report');
 
-      const addText = (text: string | undefined, size = 12) => {
-        if (!text) return;
-        finalPdf.setFontSize(size);
-        const lines = finalPdf.splitTextToSize(text, contentWidth);
-        if (yPosition + (lines.length * 5) > 280) {
-          finalPdf.addPage();
-          currentPage++;
-          yPosition = 20;
-        }
-        finalPdf.text(lines, margin, yPosition);
-        yPosition += lines.length * 5 + 3;
-      };
-
-      const addProgressBar = (label: string, value: number) => {
-        if (yPosition > 270) {
-          finalPdf.addPage();
-          currentPage++;
-          yPosition = 20;
-        }
-        finalPdf.setFontSize(10);
-        finalPdf.text(`${label}: ${value}%`, margin, yPosition);
-        
-        // Draw progress bar background
-        finalPdf.setDrawColor(200, 200, 200);
-        finalPdf.setFillColor(200, 200, 200);
-        finalPdf.rect(margin, yPosition + 2, 100, 3, 'F');
-        
-        // Draw progress bar value
-        finalPdf.setDrawColor(102, 89, 223);
-        finalPdf.setFillColor(102, 89, 223);
-        finalPdf.rect(margin, yPosition + 2, value, 3, 'F');
-        
-        yPosition += 8;
-      };
-
-      // Title and Query
-      addHeading('Query Analysis Report', 24);
-      finalPdf.setTextColor(102, 89, 223);
-      addText(`Query: ${query}`, 16);
-      yPosition += 5;
+      // Add query info
+      finalPdf.setFontSize(14);
+      finalPdf.setTextColor(brand?.color || '#6659df');
+      finalPdf.text(`Query: ${query}`, 20, yPosition);
+      yPosition += 10;
 
       // AI Overview Section
       if (aiOverviewData?.text_blocks?.length) {
-        addHeading('AI Overview', 20);
+        finalPdf.setFontSize(18);
+        finalPdf.setTextColor(0, 0, 0);
+        finalPdf.text('AI Overview', 20, yPosition);
+        yPosition += 10;
         aiOverviewData.text_blocks.forEach(block => {
           if (block.type === 'paragraph' && block.snippet) {
-            addText(block.snippet);
+            finalPdf.setFontSize(12);
+            finalPdf.setTextColor(0, 0, 0);
+            finalPdf.text(block.snippet, 20, yPosition);
+            yPosition += 10;
           } else if (block.type === 'list' && block.list) {
+            finalPdf.setFontSize(12);
+            finalPdf.setTextColor(0, 0, 0);
             block.list.forEach(item => {
               if (item.title) {
-                addText(`• ${item.title}`);
+                finalPdf.text(`• ${item.title}`, 20, yPosition);
                 if (item.snippet) {
                   finalPdf.setTextColor(100, 100, 100);
-                  addText(item.snippet, 10);
+                  finalPdf.text(item.snippet, 20, yPosition + 5);
                   finalPdf.setTextColor(0, 0, 0);
                 }
+                yPosition += 10;
               }
             });
           }
@@ -433,18 +427,25 @@ export default function QueryAnalysisPage() {
 
       // Optimization Analysis Section
       if (aiOverviewData?.references?.length) {
-        yPosition += 3;
-        addHeading('Optimization Analysis', 20);
+        yPosition += 10;
+        finalPdf.setFontSize(18);
+        finalPdf.setTextColor(0, 0, 0);
+        finalPdf.text('Optimization Analysis', 20, yPosition);
+        yPosition += 10;
 
         // Reference Analysis
-        addText('Reference Analysis', 14);
+        finalPdf.setFontSize(12);
+        finalPdf.setTextColor(0, 0, 0);
+        finalPdf.text('Reference Analysis', 20, yPosition);
         const domains = new Set(aiOverviewData.references.map(ref => new URL(ref.link).hostname));
-        addText(`Number of unique source domains: ${domains.size}`, 11);
-        addText(`Total references: ${aiOverviewData.references.length}`, 11);
-        yPosition += 3;
+        finalPdf.text(`Number of unique source domains: ${domains.size}`, 20, yPosition + 5);
+        finalPdf.text(`Total references: ${aiOverviewData.references.length}`, 20, yPosition + 10);
+        yPosition += 15;
 
         // Competitor Analysis
-        addText('Competitor Analysis', 14);
+        finalPdf.setFontSize(12);
+        finalPdf.setTextColor(0, 0, 0);
+        finalPdf.text('Competitor Analysis', 20, yPosition);
         const competitors = aiOverviewData.references.reduce((acc, ref) => {
           const domain = new URL(ref.link).hostname;
           acc[domain] = (acc[domain] || 0) + 1;
@@ -455,36 +456,48 @@ export default function QueryAnalysisPage() {
           .sort(([, a], [, b]) => b - a)
           .slice(0, 5)
           .forEach(([domain, count]) => {
-            addText(`• ${domain}: ${count} references`, 11);
+            finalPdf.text(`• ${domain}: ${count} references`, 20, yPosition);
+            yPosition += 5;
           });
       }
 
       // References Section
       if (aiOverviewData?.references?.length) {
-        yPosition += 3;
-        addHeading('References', 20);
+        yPosition += 10;
+        finalPdf.setFontSize(18);
+        finalPdf.setTextColor(0, 0, 0);
+        finalPdf.text('References', 20, yPosition);
+        yPosition += 10;
         
         aiOverviewData.references.forEach((ref, index) => {
           if (ref.title) {
             const refText = `${index + 1}. ${ref.title}`;
-            addText(refText, 11);
+            finalPdf.setFontSize(11);
+            finalPdf.setTextColor(0, 0, 0);
+            finalPdf.text(refText, 20, yPosition);
             if (ref.snippet) {
               finalPdf.setTextColor(100, 100, 100);
-              addText(ref.snippet, 10);
-              addText(`Source: ${ref.source}`, 9);
+              finalPdf.text(ref.snippet, 20, yPosition + 5);
               finalPdf.setTextColor(0, 0, 0);
             }
+            finalPdf.text(`Source: ${ref.source}`, 20, yPosition + 10);
+            yPosition += 15;
           }
         });
       }
 
       // SERP Analysis Section
       if (organicResults.length) {
-        yPosition += 3;
-        addHeading('SERP Analysis', 20);
+        yPosition += 10;
+        finalPdf.setFontSize(18);
+        finalPdf.setTextColor(0, 0, 0);
+        finalPdf.text('SERP Analysis', 20, yPosition);
+        yPosition += 10;
 
         // SERP Features
-        addText('SERP Features', 14);
+        finalPdf.setFontSize(12);
+        finalPdf.setTextColor(0, 0, 0);
+        finalPdf.text('SERP Features', 20, yPosition);
         const features = {
           'Organic Results': organicResults.length,
           'Rich Snippets': organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions).length,
@@ -492,12 +505,14 @@ export default function QueryAnalysisPage() {
         };
 
         Object.entries(features).forEach(([label, value]) => {
-          addText(`${label}: ${value}`, 11);
+          finalPdf.text(`${label}: ${value}`, 20, yPosition);
+          yPosition += 5;
         });
 
         // Content Types
-        yPosition += 3;
-        addText('Content Types', 14);
+        finalPdf.setFontSize(12);
+        finalPdf.setTextColor(0, 0, 0);
+        finalPdf.text('Content Types', 20, yPosition);
         const contentTypes = {
           'Visual Content': organicResults.filter(r => r.thumbnail).length,
           'Reviews': organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions?.rating).length,
@@ -505,60 +520,63 @@ export default function QueryAnalysisPage() {
         };
 
         Object.entries(contentTypes).forEach(([label, value]) => {
-          addText(`${label}: ${value}`, 11);
+          finalPdf.text(`${label}: ${value}`, 20, yPosition);
+          yPosition += 5;
         });
       }
 
       // Organic Results Section
       if (organicResults.length) {
-        yPosition += 5;
-        addHeading('Organic Results', 20);
+        yPosition += 10;
+        finalPdf.setFontSize(18);
+        finalPdf.setTextColor(0, 0, 0);
+        finalPdf.text('Organic Results', 20, yPosition);
+        yPosition += 10;
         
         organicResults.forEach((result, index) => {
-          if (yPosition > 250) {
-            finalPdf.addPage();
-            currentPage++;
-            yPosition = 20;
-          }
-
-          finalPdf.setTextColor(102, 89, 223);
-          addText(`${index + 1}. ${result.title}`, 12);
+          finalPdf.setFontSize(12);
+          finalPdf.setTextColor(0, 0, 0);
+          finalPdf.text(`${index + 1}. ${result.title}`, 20, yPosition);
           if (result.displayed_link) {
             finalPdf.setTextColor(100, 100, 100);
-            addText(result.displayed_link, 10);
+            finalPdf.text(result.displayed_link, 20, yPosition + 5);
           }
           finalPdf.setTextColor(0, 0, 0);
           if (result.snippet) {
-            addText(result.snippet, 11);
+            finalPdf.text(result.snippet, 20, yPosition + 5);
           }
 
           // Add rich snippet info if available
           if (result.rich_snippet?.bottom?.detected_extensions) {
             const ext = result.rich_snippet.bottom.detected_extensions;
-            if (ext.rating) addText(`Rating: ${ext.rating}/5 (${ext.reviews} reviews)`, 10);
-            if (ext.price) addText(`Price: ${ext.currency}${ext.price}`, 10);
+            if (ext.rating) finalPdf.text(`Rating: ${ext.rating}/5 (${ext.reviews} reviews)`, 20, yPosition + 5);
+            if (ext.price) finalPdf.text(`Price: ${ext.currency}${ext.price}`, 20, yPosition + 5);
           }
 
           // Add sitelinks if available
           if (result.sitelinks?.list?.length) {
-            addText('Sitelinks:', 10);
+            finalPdf.setFontSize(10);
+            finalPdf.setTextColor(102, 89, 223);
+            finalPdf.text('Sitelinks:', 20, yPosition + 5);
             result.sitelinks.list.forEach(link => {
               if (link.title) {
-                finalPdf.setTextColor(102, 89, 223);
-                addText(`- ${link.title}`, 9);
+                finalPdf.text(`- ${link.title}`, 20, yPosition + 10);
               }
             });
             finalPdf.setTextColor(0, 0, 0);
           }
 
-          yPosition += 3;
+          yPosition += 15;
         });
       }
 
-      // Add logo at the end
+      // Add logo to all pages
       await addLogoToPdf(finalPdf);
 
-      finalPdf.save(`query-analysis-${query}-${new Date().toISOString().split('T')[0]}.pdf`);
+      // Save with formatted name
+      const date = new Date().toISOString().split('T')[0];
+      const brandPrefix = brand?.name ? `${brand.name}-` : '';
+      finalPdf.save(`${brandPrefix}query-analysis-${query}-${date}.pdf`);
       setExportProgress('Export completed successfully!');
     } catch (error) {
       console.error('Failed to generate report:', error);
@@ -581,42 +599,22 @@ export default function QueryAnalysisPage() {
       const finalPdf = new jsPDF();
       let currentPage = 1;
 
+      // Add header with brand and report info
+      let yPosition = addHeaderToPdf(finalPdf, 'Full Keywords Analysis Report');
+
+      // Add report summary
+      finalPdf.setFontSize(12);
+      finalPdf.setTextColor(0, 0, 0);
+      finalPdf.text(`Total Keywords: ${keywords.length}`, 20, yPosition);
+      yPosition += 10;
+
       // Analyze each keyword
       for (let i = 0; i < keywords.length; i++) {
         const keyword = keywords[i];
         setReportProgress(`Analyzing keyword ${i + 1}/${keywords.length}: ${keyword.term}`);
 
-        let yPosition = 20;
-        const margin = 20;
-        const contentWidth = 170;
-
-        const addHeading = (text: string, size = 16) => {
-          if (yPosition > 270) {
-            finalPdf.addPage();
-            currentPage++;
-            yPosition = 20;
-          }
-          finalPdf.setFontSize(size);
-          finalPdf.setTextColor(0, 0, 0);
-          finalPdf.text(text, margin, yPosition);
-          yPosition += size / 2 + 3;
-        };
-
-        const addText = (text: string | undefined, size = 12) => {
-          if (!text) return;
-          finalPdf.setFontSize(size);
-          const lines = finalPdf.splitTextToSize(text, contentWidth);
-          if (yPosition + (lines.length * 5) > 280) {
-            finalPdf.addPage();
-            currentPage++;
-            yPosition = 20;
-          }
-          finalPdf.text(lines, margin, yPosition);
-          yPosition += lines.length * 5 + 3;
-        };
-
         try {
-          // Add page break except for first page
+          // Add page break except for first keyword
           if (i > 0) {
             finalPdf.addPage();
             currentPage++;
@@ -627,68 +625,70 @@ export default function QueryAnalysisPage() {
           const data = await fetchAIOverview(keyword.term);
 
           // Add keyword header
-          addHeading(`Keyword Analysis: ${keyword.term}`, 20);
-          addText(`Volume: ${keyword.volume || 'N/A'}`);
-          addText(`AI Overview Likelihood: ${keyword.aiOverviewLikelihood || 'N/A'}%`);
-          addText(`Optimization Difficulty: ${keyword.optimizationDifficulty || 'N/A'}%`);
+          finalPdf.setFontSize(16);
+          finalPdf.setTextColor(0, 0, 0);
+          finalPdf.text(`Keyword Analysis: ${keyword.term}`, 20, yPosition);
+          yPosition += 10;
+
+          // Add metrics
+          finalPdf.setFontSize(12);
+          finalPdf.text(`Volume: ${keyword.volume || 'N/A'}`, 20, yPosition);
+          yPosition += 5;
+          finalPdf.text(`AI Overview Likelihood: ${keyword.aiOverviewLikelihood || 'N/A'}%`, 20, yPosition);
+          yPosition += 5;
+          finalPdf.text(`Optimization Difficulty: ${keyword.optimizationDifficulty || 'N/A'}%`, 20, yPosition);
+          yPosition += 5;
           if (keyword.purchaseIntent !== undefined && keyword.purchaseIntent !== null) {
-            addText(`Purchase Intent: ${keyword.purchaseIntent}%`);
+            finalPdf.text(`Purchase Intent: ${keyword.purchaseIntent}%`, 20, yPosition);
+            yPosition += 5;
           }
           yPosition += 5;
 
           // Add AI Overview content
           if (data?.ai_overview?.text_blocks?.length) {
-            addHeading('AI Overview', 18);
+            if (yPosition > 250) {
+              finalPdf.addPage();
+              currentPage++;
+              yPosition = 20;
+            }
+            finalPdf.setFontSize(14);
+            finalPdf.text('AI Overview', 20, yPosition);
+            yPosition += 10;
+
             data.ai_overview.text_blocks.forEach(block => {
+              if (yPosition > 250) {
+                finalPdf.addPage();
+                currentPage++;
+                yPosition = 20;
+              }
+
               if (block.type === 'paragraph' && block.snippet) {
-                addText(block.snippet);
+                finalPdf.setFontSize(11);
+                const lines = finalPdf.splitTextToSize(block.snippet, 170);
+                finalPdf.text(lines, 20, yPosition);
+                yPosition += lines.length * 5 + 5;
               } else if (block.type === 'list' && block.list) {
                 block.list.forEach(item => {
+                  if (yPosition > 250) {
+                    finalPdf.addPage();
+                    currentPage++;
+                    yPosition = 20;
+                  }
                   if (item.title) {
-                    addText(`• ${item.title}`);
+                    finalPdf.setFontSize(11);
+                    finalPdf.text(`• ${item.title}`, 20, yPosition);
+                    yPosition += 5;
                     if (item.snippet) {
                       finalPdf.setTextColor(100, 100, 100);
-                      addText(item.snippet, 10);
+                      const lines = finalPdf.splitTextToSize(item.snippet, 160);
+                      finalPdf.text(lines, 25, yPosition);
+                      yPosition += lines.length * 5;
                       finalPdf.setTextColor(0, 0, 0);
                     }
+                    yPosition += 5;
                   }
                 });
               }
-            });
-          }
-
-          // Add references
-          if (data?.ai_overview?.references?.length) {
-            yPosition += 3;
-            addHeading('References', 18);
-            data.ai_overview.references.forEach((ref, index) => {
-              if (ref.title) {
-                addText(`${index + 1}. ${ref.title}`, 11);
-                if (ref.snippet) {
-                  finalPdf.setTextColor(100, 100, 100);
-                  addText(ref.snippet, 10);
-                  addText(`Source: ${ref.source}`, 9);
-                  finalPdf.setTextColor(0, 0, 0);
-                }
-              }
-            });
-          }
-
-          // Add organic results summary
-          if (data?.organic_results?.length) {
-            yPosition += 3;
-            addHeading('Top Organic Results', 18);
-            data.organic_results.slice(0, 3).forEach((result, index) => {
-              addText(`${index + 1}. ${result.title}`, 12);
-              if (result.displayed_link) {
-                finalPdf.setTextColor(100, 100, 100);
-                addText(result.displayed_link, 10);
-              }
-              if (result.snippet) {
-                finalPdf.setTextColor(0, 0, 0);
-                addText(result.snippet, 11);
-              }
-              yPosition += 2;
             });
           }
 
@@ -699,26 +699,21 @@ export default function QueryAnalysisPage() {
             currentPage++;
             yPosition = 20;
           }
-          finalPdf.setFontSize(16);
+          finalPdf.setFontSize(12);
           finalPdf.setTextColor(255, 0, 0);
-          finalPdf.text('Error', margin, yPosition);
-          yPosition += 16;
-          
-          finalPdf.setFontSize(11);
-          const errorMessage = `Failed to analyze keyword: ${error instanceof Error ? error.message : 'Unknown error'}`;
-          const lines = finalPdf.splitTextToSize(errorMessage, contentWidth);
-          finalPdf.text(lines, margin, yPosition);
-          yPosition += lines.length * 5 + 3;
-          
+          finalPdf.text(`Error analyzing keyword: ${error instanceof Error ? error.message : 'Unknown error'}`, 20, yPosition);
           finalPdf.setTextColor(0, 0, 0);
+          yPosition += 10;
         }
       }
 
-      // Add logo to the last page
+      // Add logo to all pages
       await addLogoToPdf(finalPdf);
 
-      // Save the combined report
-      finalPdf.save(`full-analysis-report-${new Date().toISOString().split('T')[0]}.pdf`);
+      // Save with formatted name
+      const date = new Date().toISOString().split('T')[0];
+      const brandPrefix = brand?.name ? `${brand.name}-` : '';
+      finalPdf.save(`${brandPrefix}full-analysis-report-${date}.pdf`);
       setReportProgress('Report generated successfully!');
     } catch (error) {
       console.error('Failed to generate full report:', error);
