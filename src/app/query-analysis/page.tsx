@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import AIOverviewCard from '@/components/AIOverview/AIOverviewCard';
 import CompetitorAnalysis from '@/components/CompetitorAnalysis/CompetitorAnalysis';
@@ -20,6 +20,7 @@ import { useAIOverview } from '@/lib/store/useAIOverview';
 import { OrganicResult } from '@/types/aiOverview';
 
 import { fetchAIOverview } from '@/lib/api/aiOverview';
+import { RefreshCw } from 'lucide-react';
 
 interface LocationData {
   city: string;
@@ -41,9 +42,20 @@ export default function QueryAnalysisPage() {
 
   // Get user's location
   useEffect(() => {
+    const handleLocationError = () => {
+      // Set a default location as fallback
+      setUserLocation({
+        city: 'San Francisco',
+        state: 'California',
+        country: 'US',
+      });
+      console.warn('Using default location as fallback');
+    };
+
     if (navigator.geolocation) {
       const locationTimeout = setTimeout(() => {
         console.warn('Location request timed out');
+        handleLocationError();
       }, 10000);
 
       navigator.geolocation.getCurrentPosition(
@@ -51,33 +63,38 @@ export default function QueryAnalysisPage() {
           clearTimeout(locationTimeout);
           try {
             const response = await fetch(
-              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`,
             );
-            
+
             if (!response.ok) {
               throw new Error('Failed to fetch location data');
             }
-            
+
             const data = await response.json();
             setUserLocation({
-              city: data.city,
-              state: data.principalSubdivision,
-              country: data.countryCode
+              city: data.city || 'San Francisco',
+              state: data.principalSubdivision || 'California',
+              country: data.countryCode || 'US',
             });
           } catch (error) {
             console.error('Error getting location details:', error);
+            handleLocationError();
           }
         },
         (error) => {
           clearTimeout(locationTimeout);
           console.error('Geolocation error:', error.message);
+          handleLocationError();
         },
         {
           enableHighAccuracy: true,
           timeout: 10000,
-          maximumAge: 0
-        }
+          maximumAge: 0,
+        },
       );
+    } else {
+      // Browser doesn't support geolocation
+      handleLocationError();
     }
   }, []);
 
@@ -90,10 +107,10 @@ export default function QueryAnalysisPage() {
     return [
       { value: 'none', label: 'No time filter' },
       { value: currentYear.toString(), label: `In ${currentYear}` },
-      { 
+      {
         value: `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}`,
-        label: `In ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
-      }
+        label: `In ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`,
+      },
     ];
   };
 
@@ -107,7 +124,7 @@ export default function QueryAnalysisPage() {
       { value: 'none', label: 'No location filter' },
       { value: 'country', label: `In ${userLocation.country}` },
       { value: 'state', label: `In ${userLocation.state}, ${userLocation.country}` },
-      { value: 'city', label: `In ${userLocation.city}, ${userLocation.state}, ${userLocation.country}` }
+      { value: 'city', label: `In ${userLocation.city}, ${userLocation.state}, ${userLocation.country}` },
     ];
   };
 
@@ -181,40 +198,40 @@ export default function QueryAnalysisPage() {
       setOrganicResults([]);
       let fullQuery = `${questionWord} ${query}`.trim();
 
-                // Add time filter to query if selected
-                if (timeFilter !== 'none') {
-                  const [year, month] = timeFilter.split('-');
-                  if (month) {
-                    const date = new Date(parseInt(year), parseInt(month) - 1);
-                    fullQuery += ` in ${date.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`;
-                  } else {
-                    fullQuery += ` in ${year}`;
-                  }
-                }
+      // Add time filter to query if selected
+      if (timeFilter !== 'none') {
+        const [year, month] = timeFilter.split('-');
+        if (month) {
+          const date = new Date(parseInt(year), parseInt(month) - 1);
+          fullQuery += ` in ${date.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`;
+        } else {
+          fullQuery += ` in ${year}`;
+        }
+      }
 
-                // Add location filter to query if selected
-                if (locationFilter !== 'none' && userLocation) {
-                  let locationString = '';
-                  switch (locationFilter) {
-                    case 'country':
-                      locationString = userLocation.country;
-                      break;
-                    case 'state':
-                      locationString = `${userLocation.state}, ${userLocation.country}`;
-                      break;
-                    case 'city':
-                      locationString = `${userLocation.city}, ${userLocation.state}, ${userLocation.country}`;
-                      break;
-                  }
-                  if (locationString) {
-                    fullQuery += ` in ${locationString}`;
-                  }
-                }
+      // Add location filter to query if selected
+      if (locationFilter !== 'none' && userLocation) {
+        let locationString = '';
+        switch (locationFilter) {
+          case 'country':
+            locationString = userLocation.country;
+            break;
+          case 'state':
+            locationString = `${userLocation.state}, ${userLocation.country}`;
+            break;
+          case 'city':
+            locationString = `${userLocation.city}, ${userLocation.state}, ${userLocation.country}`;
+            break;
+        }
+        if (locationString) {
+          fullQuery += ` in ${locationString}`;
+        }
+      }
 
-                console.log('Fetching AI Overview for query:', fullQuery);
-                const data = await fetchAIOverview(fullQuery);
-                setAiOverviewData(data?.ai_overview.text_blocks, data?.ai_overview.references);
-                setOrganicResults(data?.organic_results || []);
+      console.log('Fetching AI Overview for query:', fullQuery);
+      const data = await fetchAIOverview(fullQuery);
+      setAiOverviewData(data?.ai_overview?.text_blocks, data?.ai_overview?.references);
+      setOrganicResults(data?.organic_results || []);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An unknown error occurred');
     } finally {
@@ -313,16 +330,8 @@ export default function QueryAnalysisPage() {
           </TabsList>
 
           <TabsContent value='ai-overview' className='space-y-4'>
-            {error && (
-              <Alert variant='destructive' className='mb-4'>
-                <AlertCircle className='h-4 w-4' />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
             <AIOverviewCard data={aiOverviewData} />
             <OptimizationAnalysis referenceList={aiOverviewData?.references || []} />
-
             <CompetitorAnalysis references={aiOverviewData?.references || []} />
           </TabsContent>
 
@@ -346,13 +355,13 @@ export default function QueryAnalysisPage() {
                           </div>
                           <div className='p-4 border rounded-lg'>
                             <div className='text-2xl font-bold'>
-                              {organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions).length}
+                              {organicResults.filter((r) => r.rich_snippet?.bottom?.detected_extensions).length}
                             </div>
                             <div className='text-sm text-muted-foreground'>Rich Snippets</div>
                           </div>
                           <div className='p-4 border rounded-lg'>
                             <div className='text-2xl font-bold'>
-                              {organicResults.filter(r => (r.sitelinks?.list?.length || 0) > 0).length}
+                              {organicResults.filter((r) => (r.sitelinks?.list?.length || 0) > 0).length}
                             </div>
                             <div className='text-sm text-muted-foreground'>Sitelinks</div>
                           </div>
@@ -372,20 +381,18 @@ export default function QueryAnalysisPage() {
                       {organicResults.length > 0 ? (
                         <>
                           <div className='p-4 border rounded-lg'>
-                            <div className='text-2xl font-bold'>
-                              {organicResults.filter(r => r.thumbnail).length}
-                            </div>
+                            <div className='text-2xl font-bold'>{organicResults.filter((r) => r.thumbnail).length}</div>
                             <div className='text-sm text-muted-foreground'>Visual Content</div>
                           </div>
                           <div className='p-4 border rounded-lg'>
                             <div className='text-2xl font-bold'>
-                              {organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions?.rating).length}
+                              {organicResults.filter((r) => r.rich_snippet?.bottom?.detected_extensions?.rating).length}
                             </div>
                             <div className='text-sm text-muted-foreground'>Reviews</div>
                           </div>
                           <div className='p-4 border rounded-lg'>
                             <div className='text-2xl font-bold'>
-                              {organicResults.filter(r => r.rich_snippet?.bottom?.detected_extensions?.price).length}
+                              {organicResults.filter((r) => r.rich_snippet?.bottom?.detected_extensions?.price).length}
                             </div>
                             <div className='text-sm text-muted-foreground'>Products</div>
                           </div>
