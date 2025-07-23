@@ -5,13 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useKeywordsStore } from '@/lib/store/keywordsStore';
+import { useBrandStore } from '@/lib/store/brandStore';
 import { AnalysisLinks } from '@/components/ui/analysis-links';
+import { Download } from 'lucide-react';
 
 interface KeywordResponse {
   url: string;
   keywords: string[];
   success: boolean;
   message: string;
+  brand?: {
+    name?: string;
+    color?: string;
+    logo?: string;
+  };
 }
 
 export default function WebsiteInputPage() {
@@ -22,6 +29,16 @@ export default function WebsiteInputPage() {
   const existingKeywords = useKeywordsStore((state) => state.keywords);
   const clearKeywords = useKeywordsStore((state) => state.clearKeywords);
   const [keywordResults, setKeywordResults] = useState<KeywordResponse | null>(null);
+  const setBrand = useBrandStore((state) => state.setBrand);
+
+  const extractDomainName = (url: string) => {
+    try {
+      const domain = new URL(url).hostname;
+      return domain.replace(/^www\./, '').split('.')[0];
+    } catch {
+      return '';
+    }
+  };
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +49,7 @@ export default function WebsiteInputPage() {
       let normalizedUrl = url;
       if (url.includes('.') && !url.startsWith('http://') && !url.startsWith('https://')) {
         normalizedUrl = `https://${url}`;
-        setUrl(normalizedUrl); // Update the input field
+        setUrl(normalizedUrl);
       }
 
       const response = await fetch('/api/keywords', {
@@ -57,6 +74,19 @@ export default function WebsiteInputPage() {
         optimizationDifficulty: 0,
         purchaseIntent: 0,
       })));
+
+      // Initialize brand information
+      const brandName = data.brand?.name || extractDomainName(normalizedUrl);
+      const brandColor = data.brand?.color || '#6659df'; // Default to Enception color if none found
+      const brandLogo = data.brand?.logo;
+
+      setBrand({
+        name: brandName,
+        color: brandColor,
+        website: normalizedUrl,
+        logo: brandLogo,
+      });
+
     } catch (error) {
       console.error('Error analyzing website:', error);
       alert('Failed to analyze website. Please try again.');
