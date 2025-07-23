@@ -398,7 +398,7 @@ export default function KeywordsPage() {
     <div>
       <div className='space-y-4 mb-8'>
         <div>
-          <h1 className='text-4xl font-bold'>Conversational Query Suggestions</h1>
+          <h1 className='text-4xl font-bold'>Query Overview</h1>
           <p className='text-muted-foreground mt-2'>
             Customize and manage your target conversational queries for AI optimization.
           </p>
