@@ -32,7 +32,7 @@ interface LocationData {
 export default function QueryAnalysisPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { aiOverviewData, setAiOverviewData } = useAIOverview();
+  const { aiOverviewData, setAiOverviewData, isLoading } = useAIOverview();
   const { keywords } = useKeywordsStore();
   const [query, setQuery] = useState(searchParams.get('query') || '');
   const [questionWord, setQuestionWord] = useState('what is the best');
@@ -42,6 +42,7 @@ export default function QueryAnalysisPage() {
   const [locationFilter, setLocationFilter] = useState('none');
   const [userLocation, setUserLocation] = useState<LocationData | null>(null);
   const [organicResults, setOrganicResults] = useState<OrganicResult[]>([]);
+  const [defaultTab, setDefaultTab] = useState(aiOverviewData?.text_blocks ? 'ai-overview' : 'organic-results');
 
   // Trigger initial analysis if query exists in URL
   useEffect(() => {
@@ -50,6 +51,14 @@ export default function QueryAnalysisPage() {
       handleAnalysis();
     }
   }, []); // Run only once on mount
+
+  useEffect(() => {
+    if (aiOverviewData?.text_blocks && !isLoading) {
+      setDefaultTab('ai-overview');
+    } else {
+      setDefaultTab('organic-results');
+    }
+  }, [aiOverviewData?.text_blocks, isLoading]);
 
   // Update query when URL parameter changes
   useEffect(() => {
@@ -262,7 +271,10 @@ export default function QueryAnalysisPage() {
 
       console.log('Fetching AI Overview for query:', fullQuery);
       const data = await fetchAIOverview(fullQuery);
-      setAiOverviewData(data?.ai_overview?.text_blocks, data?.ai_overview?.references);
+      if (data?.ai_overview?.text_blocks) {
+        setAiOverviewData(data?.ai_overview?.text_blocks, data?.ai_overview?.references);
+        setDefaultTab('ai-overview');
+      }
       setOrganicResults(data?.organic_results || []);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An unknown error occurred');
@@ -358,12 +370,12 @@ export default function QueryAnalysisPage() {
           </div>
         </div>
 
-        <Tabs defaultValue='ai-overview' className='space-y-2'>
+        <Tabs defaultValue={defaultTab} className='space-y-2'>
           <p className='text-sm text-muted-foreground'>Show results for:</p>
           <TabsList>
+            <TabsTrigger value='organic-results'>Organic Results</TabsTrigger>
             <TabsTrigger value='ai-overview'>Google AI Overview</TabsTrigger>
             <TabsTrigger value='serp-analysis'>SERP Analysis</TabsTrigger>
-            <TabsTrigger value='organic-results'>Organic Results</TabsTrigger>
           </TabsList>
 
           <TabsContent value='ai-overview' className='space-y-4'>
