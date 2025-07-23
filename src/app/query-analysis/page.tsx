@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AlertCircle } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import AIOverviewCard from '@/components/AIOverview/AIOverviewCard';
@@ -29,9 +30,11 @@ interface LocationData {
 }
 
 export default function QueryAnalysisPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { aiOverviewData, setAiOverviewData } = useAIOverview();
   const { keywords } = useKeywordsStore();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(searchParams.get('query') || '');
   const [questionWord, setQuestionWord] = useState('what is the best');
   const [error, setError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -39,6 +42,23 @@ export default function QueryAnalysisPage() {
   const [locationFilter, setLocationFilter] = useState('none');
   const [userLocation, setUserLocation] = useState<LocationData | null>(null);
   const [organicResults, setOrganicResults] = useState<OrganicResult[]>([]);
+
+  // Trigger initial analysis if query exists in URL
+  useEffect(() => {
+    const urlQuery = searchParams.get('query');
+    if (urlQuery) {
+      handleAnalysis();
+    }
+  }, []); // Run only once on mount
+
+  // Update query when URL parameter changes
+  useEffect(() => {
+    const urlQuery = searchParams.get('query');
+    if (urlQuery && urlQuery !== query) {
+      setQuery(urlQuery);
+      handleAnalysis();
+    }
+  }, [searchParams]);
 
   // Get user's location
   useEffect(() => {
@@ -130,6 +150,13 @@ export default function QueryAnalysisPage() {
 
   const handleKeywordClick = (term: string) => {
     setQuery(term);
+    // Update URL when clicking a keyword
+    router.push(`/query-analysis?query=${encodeURIComponent(term)}`);
+  };
+
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
   };
 
   const faqItems = [
@@ -192,6 +219,11 @@ export default function QueryAnalysisPage() {
 
   const handleAnalysis = async () => {
     try {
+      // Update URL when analyzing
+      if (query) {
+        router.push(`/query-analysis?query=${encodeURIComponent(query)}`);
+      }
+      
       setIsAnalyzing(true);
       setError(null);
       setAiOverviewData([], []);
@@ -268,7 +300,12 @@ export default function QueryAnalysisPage() {
             placeholder='Enter query to analyze...'
             className='max-w-xl'
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleQueryChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !isAnalyzing) {
+                handleAnalysis();
+              }
+            }}
           />
 
           {/* Simplified Time Filter */}
