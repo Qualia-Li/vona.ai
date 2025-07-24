@@ -139,12 +139,17 @@ export default function WebsiteInputPage() {
             </CardHeader>
             <CardContent>
               {keywordResults.keywords.length > 0 ? (
-                <div className='grid gap-2'>
-                  {keywordResults.keywords.map((keyword, index) => (
-                    <div key={index} className='p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors'>
-                      <div className='font-medium'>{keyword}</div>
-                    </div>
-                  ))}
+                <div className='space-y-4'>
+                  <div className='flex justify-end'>
+                    <Button onClick={() => (window.location.href = '/query-overview')}>View Query Overview</Button>
+                  </div>
+                  <div className='grid gap-2'>
+                    {keywordResults.keywords.map((keyword, index) => (
+                      <div key={index} className='p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors'>
+                        <div className='font-medium'>{keyword}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <p className='text-muted-foreground'>No keywords generated.</p>
@@ -157,15 +162,16 @@ export default function WebsiteInputPage() {
       {existingKeywords.length > 0 && (
         <Card className='mt-8'>
           <CardHeader>
-            <CardTitle>Existing Queries</CardTitle>
-            <CardDescription>Queries from previous analyses</CardDescription>
+            <CardTitle>Previously Generated Keywords</CardTitle>
+            <CardDescription>Keywords from previous analyses</CardDescription>
           </CardHeader>
           <CardContent>
             <div className='space-y-4'>
-              <div className='flex justify-end'>
+              <div className='flex justify-between'>
                 <Button variant='outline' onClick={clearKeywords}>
                   Clear All
                 </Button>
+                <Button onClick={() => (window.location.href = '/query-overview')}>View Query Overview</Button>
               </div>
               <div className='grid gap-2'>
                 {existingKeywords.map((keyword) => (
@@ -178,11 +184,11 @@ export default function WebsiteInputPage() {
           </CardContent>
         </Card>
       )}
-      
+
       <div className='mt-8'>
         <AnalysisLinks url={url} />
       </div>
-      
+
       <div className='mt-8 grid gap-4'>
         <Card>
           <CardHeader>
