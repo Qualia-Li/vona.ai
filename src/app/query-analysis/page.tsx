@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { AlertCircle, Download, RefreshCw, Loader2 } from 'lucide-react';
+import { AlertCircle, Download, RefreshCw, Loader2, XCircle, CheckCircle2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -820,7 +820,7 @@ export default function QueryAnalysisPage() {
                 {isGeneratingReport ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {reportProgress || 'Analyzing keywords...'}
+                    Analyzing keywords...
                   </>
                 ) : (
                   <>
@@ -834,10 +834,38 @@ export default function QueryAnalysisPage() {
         </div>
       </div>
 
-      {exportError && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertDescription>{exportError}</AlertDescription>
-        </Alert>
+      {/* Status Message for Export */}
+      {(isExporting || isGeneratingReport) && (
+        <div className='flex items-center gap-2 justify-end mb-4'>
+          <div
+            className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 bg-blue-50 text-blue-700`}
+          >
+            <RefreshCw className='h-5 w-5 animate-spin' />
+          </div>
+          <span className='text-sm text-blue-700'>
+            {isExporting ? exportProgress || 'Generating PDF...' : reportProgress || 'Analyzing keywords...'}
+          </span>
+        </div>
+      )}
+
+      {/* Success/Error Message */}
+      {!isExporting && !isGeneratingReport && (exportProgress || exportError) && (
+        <div className='flex items-center gap-2 justify-end mb-4'>
+          <div
+            className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${
+              exportError ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'
+            }`}
+          >
+            {exportError ? (
+              <XCircle className='h-5 w-5' />
+            ) : (
+              <CheckCircle2 className='h-5 w-5' />
+            )}
+          </div>
+          <span className={`text-sm ${exportError ? 'text-red-700' : 'text-green-700'}`}>
+            {exportError || exportProgress}
+          </span>
+        </div>
       )}
 
       <div ref={contentRef} className='space-y-6'>
