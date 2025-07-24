@@ -380,19 +380,28 @@ export default function KeywordsPage() {
       // Table headers
       pdf.setFontSize(10);
       pdf.setTextColor(128, 128, 128);
-      const headers = ['Query', 'Volume', 'AI Likelihood', 'Difficulty', 'Purchase Intent', 'Status'];
-      const colWidths = [60, 25, 25, 25, 25, 20];
+      const headers = ['Query', 'Volume', 'AI Likelihood', 'Difficulty', 'Purchase Intent'];
+      // More balanced column widths with increased spacing, removed Status column
+      const colWidths = [70, 30, 30, 30, 30]; // Increased widths for all columns
       let xPosition = 20;
+      
+      // Draw headers with proper alignment
       headers.forEach((header, i) => {
-        pdf.text(header, xPosition, yPosition);
+        if (i === 0) {
+          // Left align Query header
+          pdf.text(header, xPosition, yPosition);
+        } else {
+          // Right align numeric headers
+          pdf.text(header, xPosition + colWidths[i] - 2, yPosition, { align: 'right' });
+        }
         xPosition += colWidths[i];
       });
-      yPosition += 5;
+      yPosition += 8; // Increased vertical spacing
 
       // Draw header separator
       pdf.setDrawColor(230, 230, 230);
       pdf.line(20, yPosition, 190, yPosition);
-      yPosition += 5;
+      yPosition += 8; // Increased vertical spacing
 
       // Table rows
       pdf.setFontSize(9);
@@ -404,39 +413,33 @@ export default function KeywordsPage() {
         }
 
         xPosition = 20;
-        // Query
-        pdf.text(keyword.term, xPosition, yPosition);
-        xPosition += 60;
+        // Query - Auto wrap with slightly smaller width
+        const queryLines = pdf.splitTextToSize(keyword.term, colWidths[0] - 6); // Increased padding
+        pdf.text(queryLines, xPosition + 3, yPosition); // Increased left padding
+        const queryHeight = queryLines.length * 5; // Increased line height to 5mm
+        xPosition += colWidths[0];
 
-        // Volume
-        pdf.text(keyword.volume?.toLocaleString() || '—', xPosition, yPosition);
-        xPosition += 25;
+        // Rest of the columns with more space
+        const metrics = [
+          { value: keyword.volume?.toLocaleString() || '—' },
+          { value: keyword.aiOverviewLikelihood !== undefined ? `${keyword.aiOverviewLikelihood}%` : '—' },
+          { value: keyword.optimizationDifficulty !== undefined ? `${keyword.optimizationDifficulty}%` : '—' },
+          { value: keyword.purchaseIntent !== undefined && keyword.purchaseIntent !== null ? `${keyword.purchaseIntent}%` : 'N/A' }
+        ];
 
-        // AI Likelihood
-        pdf.text(keyword.aiOverviewLikelihood !== undefined ? `${keyword.aiOverviewLikelihood}%` : '—', xPosition, yPosition);
-        xPosition += 25;
+        metrics.forEach((metric, i) => {
+          pdf.text(metric.value, xPosition + colWidths[i + 1] - 3, yPosition, { align: 'right' });
+          xPosition += colWidths[i + 1];
+        });
 
-        // Difficulty
-        pdf.text(keyword.optimizationDifficulty !== undefined ? `${keyword.optimizationDifficulty}%` : '—', xPosition, yPosition);
-        xPosition += 25;
+        // Adjust yPosition for next row with increased spacing
+        yPosition += Math.max(queryHeight, 10); // Increased minimum row height
 
-        // Purchase Intent
-        pdf.text(
-          keyword.purchaseIntent !== undefined && keyword.purchaseIntent !== null
-            ? `${keyword.purchaseIntent}%`
-            : 'N/A',
-          xPosition,
-          yPosition
-        );
-        xPosition += 25;
-
-        // Status
-        const status = keyword.analysisStatus === 'success' ? '✓' :
-                      keyword.analysisStatus === 'error' ? '✗' :
-                      keyword.analysisStatus === 'analyzing' ? '⟳' : '○';
-        pdf.text(status, xPosition, yPosition);
-
-        yPosition += 8;
+        // Add a new page if needed
+        if (yPosition > 270) {
+          pdf.addPage();
+          yPosition = 20;
+        }
       });
 
       // Add logo to all pages
@@ -806,7 +809,7 @@ export default function KeywordsPage() {
                         )}
                       </div>
                       <div>
-                        <div className='text-sm font-medium mb-2'>Purchase Intent</div>
+                        <div className='text-sm font-medium mb-2'>Intent</div>
                         {keyword.purchaseIntent !== undefined && keyword.purchaseIntent !== null ? (
                           <>
                             <Progress value={keyword.purchaseIntent} className='h-2' />
