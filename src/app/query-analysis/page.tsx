@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { AlertCircle, Download, RefreshCw, Loader2, XCircle, CheckCircle2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -29,7 +29,7 @@ interface LocationData {
   country: string;
 }
 
-export default function QueryAnalysisPage() {
+function QueryAnalysisContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { 
@@ -1054,5 +1054,20 @@ export default function QueryAnalysisPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function QueryAnalysisPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Loading query analysis...</span>
+        </div>
+      </div>
+    }>
+      <QueryAnalysisContent />
+    </Suspense>
   );
 }
