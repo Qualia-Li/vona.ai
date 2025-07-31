@@ -45,32 +45,21 @@ export function AnalysisLinks({ url }: AnalysisLinksProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Analysis Tools</CardTitle>
-        <CardDescription>
-          Analyze your website using these popular tools
-        </CardDescription>
+        <CardTitle>3rd Party Analysis Tools</CardTitle>
+        <CardDescription>Analyze your website using these popular tools</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className='grid gap-4 sm:grid-cols-2'>
           {links.map((link) => (
-            <a
-              key={link.name}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <Button
-                variant="outline"
-                className="w-full justify-between"
-              >
-                <div className="text-left">
-                  <div className="font-medium">{link.name}</div>
-                  <div className="text-xs text-muted-foreground">{link.description}</div>
-                </div>
-                <ExternalLink className="h-4 w-4 ml-2" />
-              </Button>
-            </a>
+            <div key={link.name} className='space-y-1'>
+              <div className='text-sm text-gray-600 px-1'>{link.description}</div>
+              <a href={link.url} target='_blank' rel='noopener noreferrer' className='block'>
+                <Button variant='outline' className='w-full justify-between'>
+                  <div className='font-medium'>{link.name}</div>
+                  <ExternalLink className='h-4 w-4 ml-2' />
+                </Button>
+              </a>
+            </div>
           ))}
         </div>
       </CardContent>
