@@ -38,15 +38,19 @@ export default function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up animation-delay-400">
-              <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg hover:scale-105 transition-transform">
-                <Plug className="mr-2 h-5 w-5" />
-                Install on Shopify
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg hover:scale-105 transition-transform">
-                <Play className="mr-2 h-5 w-5" />
-                Watch Demo
-              </Button>
+              <Link href="https://apps.shopify.com/search?q=vona" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg hover:scale-105 transition-transform">
+                  <Plug className="mr-2 h-5 w-5" />
+                  Install on Shopify
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="https://calendly.com/quanlai/30min" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" variant="outline" className="px-8 py-4 text-lg hover:scale-105 transition-transform">
+                  <Play className="mr-2 h-5 w-5" />
+                  Book a Demo
+                </Button>
+              </Link>
             </div>
 
             {/* Stats */}
@@ -261,14 +265,18 @@ export default function Home() {
               Join 12+ brands already seeing 25% higher conversions with voice commerce
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 hover:scale-105 transition-transform px-8 py-4 text-lg">
-                <Plug className="mr-2 h-5 w-5" />
-                Install on Shopify - Free Trial
-              </Button>
-              <Button size="lg" variant="outline" className="border-white hover:bg-white hover:text-purple-600 hover:scale-105 transition-all px-8 py-4 text-lg">
-                <MessageCircle className="mr-2 h-5 w-5" />
-                Book a Demo
-              </Button>
+              <Link href="https://apps.shopify.com/search?q=vona" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 hover:scale-105 transition-transform px-8 py-4 text-lg">
+                  <Plug className="mr-2 h-5 w-5" />
+                  Install on Shopify - Free Trial
+                </Button>
+              </Link>
+              <Link href="https://calendly.com/quanlai/30min" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" variant="outline" className="border-white hover:bg-white hover:text-purple-600 hover:scale-105 transition-all px-8 py-4 text-lg">
+                  <MessageCircle className="mr-2 h-5 w-5" />
+                  Book a Demo
+                </Button>
+              </Link>
             </div>
             <p className="text-purple-200 text-sm mt-4">
               ⚡ One-hour setup • 💰 No credit card required • 🚀 Live in minutes
@@ -276,51 +284,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center mb-4">
-                <div className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Vona
-                </div>
-              </div>
-              <p className="text-gray-400 mb-4 max-w-md">
-                The AI voice chatbot that converts. Transform your Shopify store with conversational commerce.
-              </p>
-              <p className="text-sm text-gray-500">
-                © 2024 Vona by{' '}
-                <Link href="https://enception.ai" target="_blank" className="hover:text-purple-400">
-                  Enception
-                </Link>
-                . All rights reserved.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/features" className="hover:text-white">Features</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
-                <li><Link href="/demo" className="hover:text-white">Demo</Link></li>
-                <li><Link href="/integrations" className="hover:text-white">Integrations</Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/about" className="hover:text-white">About</Link></li>
-                <li><Link href="/career" className="hover:text-white">Careers</Link></li>
-                <li><Link href="/terms" className="hover:text-white">Terms</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">Privacy</Link></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
