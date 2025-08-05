@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+
 import { Video, Share2, Globe, MessageCircle, BarChart, Zap } from 'lucide-react';
 
 const features = [
@@ -40,24 +40,14 @@ export const Features = () => {
   return (
     <section className='py-24 bg-gray-50'>
       <div className='container px-4 mx-auto'>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className='max-w-4xl mx-auto text-center mb-16'
-        >
+        <div className='max-w-4xl mx-auto text-center mb-16'>
           <h2 className='text-4xl font-bold text-gray-900 mb-4'>What you get with Vona</h2>
-        </motion.div>
+        </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto'>
           {features.map((feature, index) => (
-            <motion.div
+            <div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
               className='bg-white rounded-lg p-8 shadow-lg hover:shadow-xl transition-shadow duration-300'
             >
               <div className='flex items-center mb-4'>
@@ -67,7 +57,7 @@ export const Features = () => {
                 <h3 className='text-xl font-semibold text-gray-900'>{feature.title}</h3>
               </div>
               <p className='text-gray-600'>{feature.description}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

@@ -1,50 +1,46 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-
-import { cn } from '@/lib/utils';
-
-const items = [
-  {
-    title: 'Website Input',
-    href: '/website',
-  },
-  {
-    title: 'Query Overview',
-    href: '/query-overview',
-  },
-  {
-    title: 'Query Analysis',
-    href: '/query-analysis',
-  },
-  {
-    title: 'Content',
-    href: '/content',
-  },
-  {
-    title: 'Performance',
-    href: '/performance',
-  },
-];
+import Image from 'next/image';
 
 export function MainNav() {
-  const pathname = usePathname();
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    element?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <nav className='flex items-center space-x-6 lg:space-x-8'>
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            'text-sm font-medium transition-colors hover:text-primary',
-            pathname === item.href ? 'text-black dark:text-white' : 'text-muted-foreground',
-          )}
+    <nav className='flex items-center justify-between w-full'>
+      <Link href='/' className='flex items-center'>
+        <Image
+          src='/images/vona_logo.png'
+          alt='Vona'
+          width={120}
+          height={40}
+          className='h-8 w-auto'
+        />
+      </Link>
+      
+      <div className='hidden md:flex items-center space-x-8'>
+        <button 
+          onClick={() => scrollToSection('features')}
+          className='text-gray-700 hover:text-purple-600 transition-colors font-medium'
         >
-          {item.title}
-        </Link>
-      ))}
+          Features
+        </button>
+        <button 
+          onClick={() => scrollToSection('usecases')}
+          className='text-gray-700 hover:text-purple-600 transition-colors font-medium'
+        >
+          Use Cases
+        </button>
+        <button 
+          onClick={() => scrollToSection('testimonials')}
+          className='text-gray-700 hover:text-purple-600 transition-colors font-medium'
+        >
+          Testimonials
+        </button>
+      </div>
     </nav>
   );
 }

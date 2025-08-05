@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -33,13 +32,7 @@ export const CTA = () => {
   return (
     <section id='signup' className='py-24 bg-gray-900 text-white'>
       <div className='container px-4 mx-auto'>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className='max-w-3xl mx-auto text-center'
-        >
+        <div className='max-w-3xl mx-auto text-center'>
           <h2 className='text-4xl font-bold mb-6'>Ready to be discovered by AI?</h2>
           <p className='text-xl text-gray-400 mb-12'>
             Join the early access list and be among the first to optimize your content for AI search engines.
@@ -84,7 +77,7 @@ export const CTA = () => {
               Privacy Policy
             </a>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

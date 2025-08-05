@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+
 
 const stats = [
   { value: '90%', description: 'of searches still happen on Google' },
@@ -12,28 +12,18 @@ export const Problem = () => {
   return (
     <section className='py-24 bg-gray-50'>
       <div className='container px-4 mx-auto'>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className='max-w-4xl mx-auto text-center'
-        >
+        <div className='max-w-4xl mx-auto text-center'>
           <h2 className='mb-8 text-4xl font-bold text-gray-900'>Search has changed. SEO hasn&apos;t.</h2>
 
           <div className='grid grid-cols-1 gap-8 mt-12 md:grid-cols-3'>
             {stats.map((stat, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
                 className='p-6 bg-white rounded-lg shadow-lg'
               >
                 <div className='text-3xl font-bold text-blue-600 mb-2'>{stat.value}</div>
                 <p className='text-gray-600'>{stat.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
 
@@ -62,7 +52,7 @@ export const Problem = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

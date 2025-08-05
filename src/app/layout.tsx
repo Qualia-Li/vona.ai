@@ -18,22 +18,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='en'>
       <body className={inter.className}>
         <div className='border-b'>
-          <div className='flex h-16 items-center px-4'>
-            <div className='mr-8 flex items-center'>
-              <Image
-                src='/images/vona_logo.png'
-                alt='Vona Logo'
-                width={140}
-                height={32}
-                priority
-                className='h-8 w-auto'
-              />
-              <span className='text-lg font-bold'>Vona</span>
-            </div>
+          <div className='flex h-16 items-center px-4 max-w-7xl mx-auto'>
             <MainNav />
           </div>
         </div>
-        <main className='container mx-auto py-6'>{children}</main>
+        <main>{children}</main>
         <Footer />
       </body>
     </html>

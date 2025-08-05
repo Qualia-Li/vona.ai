@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+
 import { ArrowRight, Youtube, MessageSquare, Layout } from 'lucide-react';
 
 const workflowSteps = [
@@ -25,13 +25,7 @@ export const Solution = () => {
   return (
     <section className='py-24 bg-white'>
       <div className='container px-4 mx-auto'>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className='max-w-4xl mx-auto text-center'
-        >
+        <div className='max-w-4xl mx-auto text-center'>
           <h2 className='mb-6 text-4xl font-bold text-gray-900'>We optimize content for AI search, not just Google.</h2>
           <p className='mb-16 text-xl text-gray-600'>
             Our AI agent system generates and distributes long-tail content — including YouTube videos, Reddit posts,
@@ -41,12 +35,8 @@ export const Solution = () => {
           <div className='relative'>
             <div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
               {workflowSteps.map((step, index) => (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
                   className='relative'
                 >
                   <div className='p-6 bg-gray-50 rounded-lg border border-gray-200 h-full'>
@@ -61,17 +51,11 @@ export const Solution = () => {
                       <ArrowRight className='w-6 h-6 text-gray-400' />
                     </div>
                   )}
-                </motion.div>
+                </div>
               ))}
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className='mt-16 p-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg text-white'
-            >
+            <div className='mt-16 p-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg text-white'>
               <div className='flex flex-col md:flex-row items-center justify-between'>
                 <div className='mb-6 md:mb-0'>
                   <h4 className='text-2xl font-semibold'>AI Response Engine</h4>
@@ -83,9 +67,9 @@ export const Solution = () => {
                   <span className='px-4 py-2 bg-white/10 rounded-lg'>Perplexity</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
