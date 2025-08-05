@@ -1,10 +1,10 @@
-This is a NextJS project for Enception.AI, the AI influence engine. 
+This is a NextJS project for Vona.AI (https://www.tryvona.ai), the AI chatbot for Shopify. 
 
 When generating frontend, make sure you do it to maximize the SEO, use server side rendering when possible. When adding a page, remember to add it also to sitemap.xml.
 
 Before adding a new type or interface, please check if there is any types under src/types/*.
 
-The brand color is #6659df. For buttons, you dont need to add this color since it is already added. 
+The brand color is black #00000. For buttons, you dont need to add this color since it is already added. 
 
 Do not add too much comments (only to instruct, don't explain too much).
 
