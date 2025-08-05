@@ -40,6 +40,12 @@ export function MainNav() {
         >
           Testimonials
         </button>
+        <Link 
+          href='/demo'
+          className='text-gray-700 hover:text-purple-600 transition-colors font-medium'
+        >
+          Demo
+        </Link>
       </div>
     </nav>
   );
