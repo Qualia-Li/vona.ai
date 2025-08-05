@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mic, MicOff, ShoppingCart, Star, Search, MessageCircle, X, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Fake product data
 const fakeProducts = [
@@ -54,7 +56,7 @@ const fakeProducts = [
     price: 24.99,
     rating: 4.7,
     reviews: 445,
-    image: "https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?w=400&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=400&fit=crop",
     category: "Home & Kitchen",
     description: "Set of 2 handcrafted ceramic coffee mugs with ergonomic handles."
   },
@@ -94,6 +96,82 @@ export default function DemoPage() {
   ]);
   const [currentInput, setCurrentInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showHoverTooltip, setShowHoverTooltip] = useState(false);
+  const [hoverTimer, setHoverTimer] = useState<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Completely disable hover detection when chat is open
+    if (isChatOpen) {
+      setShowHoverTooltip(false);
+      return;
+    }
+
+    let isMouseMoving = false;
+    let moveTimeout: NodeJS.Timeout;
+    
+    const handleMouseMove = () => {
+      setShowHoverTooltip(false);
+      isMouseMoving = true;
+      
+      // Clear existing timers
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+      }
+      if (moveTimeout) {
+        clearTimeout(moveTimeout);
+      }
+      
+      // Set timeout to detect when mouse stops moving
+      moveTimeout = setTimeout(() => {
+        isMouseMoving = false;
+        
+        // Only show tooltip if mouse has stopped moving and chat is still not open
+        if (!isMouseMoving && !isChatOpen) {
+          const timer = setTimeout(() => {
+            if (!isChatOpen && !isMouseMoving) {
+              setShowHoverTooltip(true);
+            }
+          }, 2000);
+          setHoverTimer(timer);
+        }
+      }, 100);
+    };
+
+    const handleMouseLeave = () => {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+      }
+      if (moveTimeout) {
+        clearTimeout(moveTimeout);
+      }
+      setShowHoverTooltip(false);
+      isMouseMoving = false;
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+      }
+      if (moveTimeout) {
+        clearTimeout(moveTimeout);
+      }
+    };
+  }, [isChatOpen, hoverTimer]);
+
+  // Clear tooltip when chat opens
+  useEffect(() => {
+    if (isChatOpen) {
+      setShowHoverTooltip(false);
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+      }
+    }
+  }, [isChatOpen, hoverTimer]);
 
   const handleVoiceInput = async () => {
     if (!isListening) {
@@ -251,135 +329,260 @@ export default function DemoPage() {
   );
 
   const ChatWindow = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-end p-4 z-50">
-      <div className="bg-white rounded-lg shadow-2xl w-96 h-[500px] flex flex-col">
-        {/* Chat Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-purple-600 text-white rounded-t-lg">
-          <div className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            <span className="font-semibold">Vona AI Assistant</span>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsChatOpen(false)}
-            className="text-white hover:bg-purple-700"
+    <AnimatePresence>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-20 flex items-end justify-end p-4 z-50"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setIsChatOpen(false);
+          }
+        }}
+      >
+        <motion.div 
+          initial={{ scale: 0.8, opacity: 0, x: 100, y: 100 }}
+          animate={{ scale: 1, opacity: 1, x: 0, y: 0 }}
+          exit={{ scale: 0.8, opacity: 0, x: 100, y: 100 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="bg-white rounded-2xl shadow-2xl w-96 h-[500px] flex flex-col overflow-hidden border border-slate-200 relative z-60"
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
+          onMouseMove={(e) => e.stopPropagation()}
+        >
+          {/* Chat Header */}
+          <motion.div 
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-slate-700 to-slate-800 text-white"
           >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+            <div className="flex items-center gap-2">
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              >
+                <MessageCircle className="h-5 w-5" />
+              </motion.div>
+              <span className="font-semibold">Vona AI Assistant</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsChatOpen(false);
+              }}
+              className="text-white hover:bg-slate-600 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </motion.div>
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {messages.map((message, index) => (
-            <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className={`max-w-[80%] p-3 rounded-lg ${
-                  message.role === 'user'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-100 text-gray-900'
-                }`}
+          <AnimatePresence initial={false}>
+            {messages.map((message, index) => (
+              <motion.div 
+                key={index} 
+                initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ 
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 30
+                }}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                {message.content}
-              </div>
-            </div>
-          ))}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${
+                    message.role === 'user'
+                      ? 'bg-gradient-to-r from-slate-600 to-slate-700 text-white'
+                      : 'bg-gradient-to-r from-slate-50 to-slate-100 text-slate-900 border border-slate-200'
+                  }`}
+                >
+                  {message.content}
+                </motion.div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
           
           {/* Product Recommendations */}
-          {messages
-            .filter(m => m.role === 'assistant' && m.products)
-            .slice(-1)[0]?.products?.slice(0, 2)
-            .map(product => (
-              <div key={product.id} className="bg-gray-50 rounded-lg p-3 border">
-                <div className="flex gap-3">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-sm">{product.name}</h4>
-                    <div className="flex items-center gap-1 my-1">
-                      <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                      <span className="text-xs">{product.rating}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-purple-600">${product.price}</span>
-                      <Button size="sm" className="text-xs bg-purple-600 hover:bg-purple-700">
-                        Add to Cart
-                      </Button>
+          <AnimatePresence>
+            {messages
+              .filter(m => m.role === 'assistant' && m.products)
+              .slice(-1)[0]?.products?.slice(0, 2)
+              .map((product, idx) => (
+                <motion.div 
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: 0.2 + idx * 0.1 }}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  className="bg-gradient-to-r from-blue-50 to-slate-50 rounded-xl p-3 border border-slate-200 shadow-sm"
+                >
+                  <div className="flex gap-3">
+                    <motion.img 
+                      whileHover={{ scale: 1.1 }}
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-16 h-16 object-cover rounded-lg shadow-sm"
+                    />
+                    <div className="flex-1">
+                      <h4 className="font-medium text-sm text-gray-900">{product.name}</h4>
+                      <div className="flex items-center gap-1 my-1">
+                        <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                        <span className="text-xs text-gray-600">{product.rating}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-700">${product.price}</span>
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                          <Button size="sm" className="text-xs bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800">
+                            Add to Cart
+                          </Button>
+                        </motion.div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+          </AnimatePresence>
 
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-gray-100 text-gray-900 p-3 rounded-lg">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-start"
+            >
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-900 p-3 rounded-xl border border-gray-200">
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <motion.div 
+                    animate={{ y: [0, -6, 0] }}
+                    transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                    className="w-2 h-2 bg-slate-400 rounded-full"
+                  />
+                  <motion.div 
+                    animate={{ y: [0, -6, 0] }}
+                    transition={{ duration: 0.6, repeat: Infinity, delay: 0.1 }}
+                    className="w-2 h-2 bg-slate-400 rounded-full"
+                  />
+                  <motion.div 
+                    animate={{ y: [0, -6, 0] }}
+                    transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                    className="w-2 h-2 bg-slate-400 rounded-full"
+                  />
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
 
         {/* Example Prompts */}
-        <div className="p-3 border-t bg-gray-50">
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="p-3 border-t bg-gradient-to-r from-slate-50 to-blue-50"
+        >
           <p className="text-xs text-gray-600 mb-2">Try asking:</p>
           <div className="flex flex-wrap gap-1">
             {examplePrompts.slice(0, 2).map((prompt, index) => (
-              <Button
+              <motion.div
                 key={index}
-                variant="outline"
-                size="sm"
-                onClick={() => handleSendMessage(prompt)}
-                className="text-xs h-7 px-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {prompt.length > 25 ? prompt.substring(0, 25) + '...' : prompt}
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSendMessage(prompt);
+                  }}
+                  className="text-xs h-7 px-2 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
+                >
+                  {prompt.length > 25 ? prompt.substring(0, 25) + '...' : prompt}
+                </Button>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Chat Input */}
-        <div className="p-4 border-t">
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="p-4 border-t bg-white"
+        >
           <div className="flex gap-2">
             <input
               type="text"
               value={currentInput}
-              onChange={(e) => setCurrentInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(currentInput)}
+              onChange={(e) => {
+                e.stopPropagation();
+                setCurrentInput(e.target.value);
+              }}
+              onKeyPress={(e) => {
+                e.stopPropagation();
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSendMessage(currentInput);
+                }
+              }}
+              onClick={(e) => e.stopPropagation()}
+              onFocus={(e) => {
+                e.stopPropagation();
+                setShowHoverTooltip(false);
+              }}
+              onBlur={(e) => e.stopPropagation()}
               placeholder="Ask about products..."
-              className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
+              className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all"
             />
-            <Button
-              onClick={handleVoiceInput}
-              size="sm"
-              className={`${isListening ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'}`}
-            >
-              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-            </Button>
-            <Button
-              onClick={() => handleSendMessage(currentInput)}
-              size="sm"
-              className="bg-purple-600 hover:bg-purple-700"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleVoiceInput();
+                }}
+                size="sm"
+                className={`${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800'} transition-all duration-200`}
+              >
+                <motion.div
+                  animate={isListening ? { scale: [1, 1.2, 1] } : {}}
+                  transition={{ duration: 1, repeat: isListening ? Infinity : 0 }}
+                >
+                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </motion.div>
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSendMessage(currentInput);
+                }}
+                size="sm"
+                className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 transition-all duration-200"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </motion.div>
           </div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-purple-50 to-pink-50 py-16">
+      <section className="bg-gradient-to-r from-slate-50 to-blue-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* label of demo store */}
@@ -391,7 +594,7 @@ export default function DemoPage() {
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Discover the latest in tech, fashion, and lifestyle products. 
-              <span className="text-purple-600 font-semibold"> Try our AI shopping assistant!</span>
+              <span className="text-slate-700 font-semibold"> Try our AI shopping assistant!</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-black hover:bg-gray-800 text-white px-8 py-4">
@@ -400,8 +603,11 @@ export default function DemoPage() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                onClick={() => setIsChatOpen(true)}
-                className="px-8 py-4 border-purple-600 text-purple-600 hover:bg-purple-50"
+                onClick={() => {
+                  setShowHoverTooltip(false);
+                  setIsChatOpen(true);
+                }}
+                className="px-8 py-4 border-slate-600 text-slate-600 hover:bg-slate-50"
               >
                 <MessageCircle className="mr-2 h-5 w-5" />
                 Try AI Assistant
@@ -419,8 +625,8 @@ export default function DemoPage() {
             {['Electronics', 'Fashion', 'Home & Kitchen', 'Fitness'].map((category) => (
               <Card key={category} className="text-center hover:shadow-lg transition-shadow cursor-pointer">
                 <CardContent className="p-6">
-                  <div className="h-12 w-12 bg-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <ShoppingCart className="h-6 w-6 text-purple-600" />
+                  <div className="h-12 w-12 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <ShoppingCart className="h-6 w-6 text-slate-600" />
                   </div>
                   <h3 className="font-semibold">{category}</h3>
                 </CardContent>
@@ -446,14 +652,76 @@ export default function DemoPage() {
       </section>
 
       {/* Floating Chat Launcher */}
-      {!isChatOpen && (
-        <Button
-          onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-6 left-6 h-14 w-14 rounded-full bg-purple-600 hover:bg-purple-700 shadow-lg z-40 p-0"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </Button>
-      )}
+      <AnimatePresence>
+        {!isChatOpen && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  className="fixed bottom-6 right-6 z-40"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    animate={{ 
+                      y: [0, -4, 0]
+                    }}
+                    transition={{ 
+                      y: { duration: 2, repeat: Infinity }
+                    }}
+                    className="rounded-full shadow-2xl"
+                    style={{
+                      filter: 'drop-shadow(0 10px 25px rgba(71, 85, 105, 0.4))'
+                    }}
+                  >
+                    <Button
+                      onClick={() => {
+                        setShowHoverTooltip(false);
+                        setIsChatOpen(true);
+                      }}
+                      className="h-14 w-14 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 border-0 p-0 shadow-lg"
+                    >
+                      <motion.div
+                        animate={{ rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                      >
+                        <MessageCircle className="h-6 w-6" />
+                      </motion.div>
+                    </Button>
+                  </motion.div>
+                </motion.div>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="bg-gradient-to-r from-slate-700 to-slate-800 text-white border-slate-200">
+                <p>What can I help you today?</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </AnimatePresence>
+
+      {/* Hover Tooltip - Shows after 2 seconds */}
+      <AnimatePresence>
+        {showHoverTooltip && !isChatOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, x: 50 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.8, x: 50 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed bottom-20 right-8 z-50 bg-gradient-to-r from-slate-700 to-slate-800 text-white px-4 py-2 rounded-xl shadow-lg border border-slate-600 cursor-pointer"
+            onClick={() => {
+              setShowHoverTooltip(false);
+              setIsChatOpen(true);
+            }}
+          >
+            <p className="text-sm">What can I help you today?</p>
+            <div className="absolute -bottom-1 right-6 w-3 h-3 bg-slate-700 rotate-45 border-r border-b border-slate-600"></div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Chat Window Modal */}
       {isChatOpen && <ChatWindow />}
