@@ -5,9 +5,9 @@ export const generateMetadata = () => {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Enception',
+    name: 'Vona by Enception',
     description: 'AI-powered search optimization platform helping brands grow in the age of AI-native search',
-    url: 'https://enception.ai',
+    url: 'https://tryvona.ai',
     founders: [
       {
         '@type': 'Person',
@@ -24,7 +24,7 @@ export const generateMetadata = () => {
 
   return {
     alternates: {
-      canonical: 'https://enception.ai/about',
+      canonical: 'https://tryvona.ai/about',
     },
     other: {
       'script:ld+json': JSON.stringify(jsonLd),
@@ -52,7 +52,7 @@ export default function AboutPage() {
       <section className='mb-12'>
         <h2 className='text-3xl font-bold mb-6'>Our Approach</h2>
         <p className='mb-4'>
-          At Enception, we help brands rank inside these answers through Generative Engine Optimization (GEO)—a
+          At Vona by Enception, we help brands rank inside these answers through Generative Engine Optimization (GEO)—a
           full-stack system that:
         </p>
         <ul className='list-disc pl-6 mb-6'>
@@ -77,7 +77,7 @@ export default function AboutPage() {
           <div className='bg-white p-6 rounded-lg shadow-sm'>
             <Image
               src='/images/team/quanlai.png'
-              alt='Quanlai Li - Co-founder & CEO of Enception'
+                              alt='Quanlai Li - Co-founder & CEO of Vona by Enception'
               width={300}
               height={300}
               className='rounded-lg mb-4'
@@ -113,7 +113,7 @@ export default function AboutPage() {
           <div className='bg-white p-6 rounded-lg shadow-sm'>
             <Image
               src='/images/team/brittany.jpeg'
-              alt='Brittany Jiao - Co-founder & COO of Enception'
+                              alt='Brittany Jiao - Co-founder & COO of Vona by Enception'
               width={300}
               height={300}
               className='rounded-lg mb-4'
@@ -136,7 +136,7 @@ export default function AboutPage() {
               <a href='https://ohtea.co' target='_blank' rel='noopener' className='text-primary hover:text-primary/80'>
                 OhTea.co
               </a>{' '}
-              and has led sales, customer success, and onboarding for Enception—closing 7 clients in 4 weeks and
+                              and has led sales, customer success, and onboarding for Vona by Enception—closing 7 clients in 4 weeks and
               building a waitlist of 20+ brands.
             </p>
           </div>

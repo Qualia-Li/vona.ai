@@ -57,7 +57,11 @@ export function Footer() {
             </Link>
           </nav>
           <p className="text-center text-xs leading-5 text-gray-500">
-            &copy; {new Date().getFullYear()} Enception, Inc. All rights reserved.
+            &copy; {new Date().getFullYear()} Vona by{' '}
+            <Link href="https://enception.ai" target="_blank" className="hover:text-purple-600">
+              Enception, Inc
+            </Link>
+            . All rights reserved.
           </p>
         </div>
       </div>

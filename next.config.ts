@@ -53,20 +53,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  async rewrites() {
-    return [
-      // API routes redirect to EC2 server
-      {
-        source: "/api/:path*",
-        destination: "http://ec2-3-145-61-161.us-east-2.compute.amazonaws.com/api/:path*",
-      },
-      // All other routes redirect to Webflow (except _next)
-      {
-        source: "/((?!_next|api).*)",
-        destination: "https://enception-ai.webflow.io/:path*",
-      },
-    ];
-  },
 };
 
 export default nextConfig;

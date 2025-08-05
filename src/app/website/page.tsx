@@ -77,7 +77,7 @@ export default function WebsiteInputPage() {
 
       // Initialize brand information
       const brandName = data.brand?.name || extractDomainName(normalizedUrl);
-      const brandColor = data.brand?.color || '#6659df'; // Default to Enception color if none found
+      const brandColor = data.brand?.color || '#6659df'; // Default to Vona color if none found
       const brandLogo = data.brand?.logo;
 
       setBrand({
@@ -97,7 +97,7 @@ export default function WebsiteInputPage() {
 
   return (
     <div className='max-w-2xl mx-auto'>
-      <h1 className='text-4xl font-bold mb-4'>Get Started with Enception</h1>
+              <h1 className='text-4xl font-bold mb-4'>Get Started with Vona</h1>
       <p className='text-muted-foreground mb-8'>
         Enter your website URL to begin optimizing your content for AI search engines.
       </p>

@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Enception',
-  description: 'Learn how Enception collects, uses, and protects your personal information.',
+  title: 'Privacy Policy | Vona by Enception',
+  description: 'Learn how Vona by Enception collects, uses, and protects your personal information.',
   alternates: {
-    canonical: 'https://enception.ai/privacy',
+    canonical: 'https://tryvona.ai/privacy',
   },
 };
 
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
         <section className='group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100'>
           <h2 className='text-2xl font-semibold mb-4'>Introduction</h2>
           <p className='text-gray-600 mb-4'>
-            At Enception, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and
+            At Vona, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and
             safeguard your information when you use our services.
           </p>
         </section>

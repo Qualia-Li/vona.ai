@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/dashboard/'], // Adjust based on your needs
     },
-    sitemap: 'https://enception.ai/sitemap.xml', // Replace with your domain
+    sitemap: 'https://tryvona.ai/sitemap.xml', // Replace with your domain
   };
 }

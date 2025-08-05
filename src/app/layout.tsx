@@ -9,8 +9,8 @@ import { Footer } from '@/components/footer'
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Enception - AI-Powered SEO Platform',
-  description: "Optimize your website's visibility with AI-powered SEO tools",
+  title: 'Vona - The AI Voice Chatbot That Converts | Shopify Voice Commerce',
+  description: "Transform your Shopify store with Vona's voice-first shopping assistant. 25% higher conversions, 40% less cart abandonment. One-click installation.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -21,14 +21,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className='flex h-16 items-center px-4'>
             <div className='mr-8 flex items-center'>
               <Image
-                src='/images/enception_logo.png'
-                alt='Enception Logo'
+                src='/images/vona_logo.png'
+                alt='Vona Logo'
                 width={140}
                 height={32}
                 priority
                 className='h-8 w-auto'
               />
-              <span className='text-lg font-bold'>Enception</span>
+              <span className='text-lg font-bold'>Vona</span>
             </div>
             <MainNav />
           </div>

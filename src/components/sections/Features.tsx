@@ -47,7 +47,7 @@ export const Features = () => {
           transition={{ duration: 0.5 }}
           className='max-w-4xl mx-auto text-center mb-16'
         >
-          <h2 className='text-4xl font-bold text-gray-900 mb-4'>What you get with Enception</h2>
+          <h2 className='text-4xl font-bold text-gray-900 mb-4'>What you get with Vona</h2>
         </motion.div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto'>

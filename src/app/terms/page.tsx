@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | Enception',
-  description: 'Terms of Service and legal agreements for using Enception\'s AI-powered search optimization platform.',
+  title: 'Terms of Service | Vona by Enception',
+  description: 'Terms of Service and legal agreements for using Vona by Enception\'s AI-powered search optimization platform.',
   alternates: {
-    canonical: 'https://enception.ai/terms',
+    canonical: 'https://tryvona.ai/terms',
   },
 };
 
@@ -26,9 +26,9 @@ export default function TermsPage() {
 
         {/* Introduction */}
         <section className='group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100'>
-          <h2 className='text-2xl font-semibold mb-4'>Welcome to Enception</h2>
+          <h2 className='text-2xl font-semibold mb-4'>Welcome to Vona</h2>
           <p className='text-gray-600 mb-4'>
-            These Terms of Service ("Terms") govern your access to and use of Enception's website, products, and
+            These Terms of Service ("Terms") govern your access to and use of Vona's website, products, and
             services ("Services"). Please read these Terms carefully before using our Services.
           </p>
           <p className='text-gray-600'>
@@ -41,7 +41,7 @@ export default function TermsPage() {
         <section className='group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100'>
           <h2 className='text-2xl font-semibold mb-4'>Our Services</h2>
           <p className='text-gray-600 mb-4'>
-            Enception provides AI-powered search optimization solutions to help brands improve their visibility in
+            Vona provides AI-powered search optimization solutions to help brands improve their visibility in
             AI-generated search results. Our Services include, but are not limited to:
           </p>
           <ul className='list-disc pl-6 text-gray-600 space-y-2'>

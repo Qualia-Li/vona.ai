@@ -6,9 +6,9 @@ export const generateMetadata = () => {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Enception',
+    name: 'Vona by Enception',
     description: 'AI-powered search optimization platform helping brands grow in the age of AI-native search',
-    url: 'https://enception.ai',
+    url: 'https://tryvona.ai',
     founders: [
       {
         '@type': 'Person',
@@ -25,7 +25,7 @@ export const generateMetadata = () => {
 
   return {
     alternates: {
-      canonical: 'https://enception.ai/about',
+      canonical: 'https://tryvona.ai/career',
     },
     other: {
       'script:ld+json': JSON.stringify(jsonLd),
@@ -34,10 +34,10 @@ export const generateMetadata = () => {
 };
 
 // export const metadata: Metadata = {
-//   title: 'Careers at Enception | Join Our Team',
-//   description: 'Join Enception and help shape the future of AI-powered search optimization. View our open positions in engineering, marketing, and internships.',
+        //   title: 'Careers at Vona by Enception | Join Our Team',
+        //   description: 'Join Vona by Enception and help shape the future of AI-powered search optimization. View our open positions in engineering, marketing, and internships.',
 //   alternates: {
-//     canonical: 'https://enception.ai/careers',
+  //     canonical: 'https://tryvona.ai/careers',
 //   },
 // };
 
@@ -47,7 +47,7 @@ export default function CareersPage() {
       {/* Hero Section */}
       <div className="z-10 max-w-5xl w-full items-center justify-between text-sm lg:flex mb-12">
         <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-          Careers at Enception
+          Careers at Vona by Enception
         </h1>
       </div>
 
@@ -79,7 +79,7 @@ export default function CareersPage() {
             <div className="space-y-6">
               <div>
                 <h4 className="font-semibold mb-2">Role Overview:</h4>
-                <p className="text-gray-700">As the Tech Lead at Enception, you will play a crucial role in shaping the technical direction of the company. You will lead building and scaling AI-powered products, ensuring high performance, reliability, and seamless user experiences.</p>
+                <p className="text-gray-700">As the Tech Lead at Vona by Enception, you will play a crucial role in shaping the technical direction of the company. You will lead building and scaling AI-powered products, ensuring high performance, reliability, and seamless user experiences.</p>
               </div>
 
               <div>
@@ -87,7 +87,7 @@ export default function CareersPage() {
                 <ul className="list-disc pl-5 space-y-1 text-gray-700">
                   <li>Hands-on development of backend services, microservices architecture, and AI integrations</li>
                   <li>Write, review, and optimize code while following best practices</li>
-                  <li>Lead the technical architecture and development of Enception's AI-driven workspace</li>
+                  <li>Lead the technical architecture and development of Vona by Enception's AI-driven workspace</li>
                   <li>Design and optimize systems for high performance</li>
                   <li>Implement and deploy cutting-edge AI models</li>
                   <li>Oversee backend infrastructure on AWS</li>
@@ -135,7 +135,7 @@ export default function CareersPage() {
                   <h4 className="font-semibold mb-2">Role Overview:</h4>
                   <p className="text-gray-700">
                     We are seeking an LLM Fine-Tuning Intern to join our dynamic team. In this role, you will fine-tune large 
-                    language models (LLMs) on GPU clusters using data and compute resources provided by Enception. The position 
+                    language models (LLMs) on GPU clusters using data and compute resources provided by Vona by Enception. The position 
                     also includes contributing to the writing of a workshop paper and submitting it for publication.
                   </p>
                 </div>
