@@ -718,7 +718,7 @@ export default function DemoPage() {
             }}
           >
             <p className="text-sm">What can I help you today?</p>
-            <div className="absolute -bottom-1 right-6 w-3 h-3 bg-slate-700 rotate-45 border-r border-b border-slate-600"></div>
+            <div className="absolute -bottom-1 right-6 w-3 h-3 bg-slate-700 rotate-45 border-r border-b border-slate-600" />
           </motion.div>
         )}
       </AnimatePresence>
